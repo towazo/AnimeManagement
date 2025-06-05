@@ -31,3 +31,10 @@ export interface AnimeFilters {
   selectedGenres: Genre[];
   sortBy: SortOption;
 }
+
+export interface CustomList {
+  id: string;
+  name: string;
+  description?: string;
+  animeIds: string[];
+}

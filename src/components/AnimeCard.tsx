@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react'; // useState をインポート
 import { 
   Card, 
   CardContent, 
@@ -8,10 +8,13 @@ import {
   Box, 
   Rating, 
   IconButton, 
-  CardActions 
+  CardActions, 
+  Menu, // 追加
+  MenuItem // 追加
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, Refresh as RefreshIcon } from '@mui/icons-material';
+import { Edit as EditIcon, Delete as DeleteIcon, Refresh as RefreshIcon, PlaylistAdd as PlaylistAddIcon } from '@mui/icons-material'; // PlaylistAddIcon を追加
 import { Anime, Genre } from '../types';
+import { useCustomLists } from '../context/CustomListContext'; // 追加
 
 // ジャンルごとの色を定義
 const genreColors: Record<Genre, string> = {
@@ -36,10 +39,29 @@ interface AnimeCardProps {
 }
 
 const AnimeCard: React.FC<AnimeCardProps> = ({ anime, onEdit, onDelete, onRewatch }) => {
+  const { customLists, addAnimeToCustomList } = useCustomLists(); // 追加
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); // 追加
+  const open = Boolean(anchorEl); // 追加
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
   };
+
+  // 追加: メニューハンドラ
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleAddToList = (listId: string) => {
+    addAnimeToCustomList(listId, anime.id);
+    handleMenuClose();
+    // ここでユーザーにフィードバック（例: Snackbar）を表示することも検討できます
+  };
+  // --- 追加ここまで ---
 
   return (
     <Card sx={{ 
@@ -101,6 +123,29 @@ const AnimeCard: React.FC<AnimeCardProps> = ({ anime, onEdit, onDelete, onRewatc
       </CardContent>
       
       <CardActions sx={{ justifyContent: 'flex-end', p: 1 }}>
+        {/* 追加: リストに追加ボタンとメニュー */}
+        <IconButton size="small" onClick={handleMenuClick} title="リストに追加">
+          <PlaylistAddIcon />
+        </IconButton>
+        <Menu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleMenuClose}
+          MenuListProps={{
+            'aria-labelledby': 'add-to-list-button',
+          }}
+        >
+          {customLists.length > 0 ? (
+            customLists.map((list) => (
+              <MenuItem key={list.id} onClick={() => handleAddToList(list.id)}>
+                {list.name}
+              </MenuItem>
+            ))
+          ) : (
+            <MenuItem disabled>カスタムリストがありません</MenuItem>
+          )}
+        </Menu>
+        {/* --- 追加ここまで --- */}
         <IconButton size="small" onClick={() => onRewatch(anime.id)} title="再視聴">
           <RefreshIcon />
         </IconButton>

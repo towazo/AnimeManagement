@@ -13,7 +13,8 @@ import {
 import {
   Home as HomeIcon,
   BarChart as StatsIcon,
-  Movie as MovieIcon
+  Movie as MovieIcon,
+  ListAlt as ListAltIcon // 追加
 } from '@mui/icons-material';
 
 interface LayoutProps {
@@ -58,6 +59,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               {isMobile ? <StatsIcon /> : '統計'}
             </Button>
+            {/* 追加ここから */}
+            <Button
+              component={RouterLink}
+              to="/custom-lists"
+              color="inherit"
+              startIcon={!isMobile && <ListAltIcon />}
+              sx={{
+                fontWeight: location.pathname === '/custom-lists' ? 'bold' : 'normal',
+                borderBottom: location.pathname === '/custom-lists' ? '2px solid white' : 'none'
+              }}
+            >
+              {isMobile ? <ListAltIcon /> : 'カスタムリスト'}
+            </Button>
+            {/* 追加ここまで */}
           </Box>
         </Toolbar>
       </AppBar>

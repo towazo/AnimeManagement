@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react'; // useState をインポート
 import {
   Table,
   TableBody,
@@ -11,10 +11,18 @@ import {
   Chip,
   Box,
   IconButton,
-  Typography
+  Typography,
+  Menu, // 追加
+  MenuItem // 追加
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, Refresh as RefreshIcon } from '@mui/icons-material';
+import {
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Refresh as RefreshIcon,
+  PlaylistAdd as PlaylistAddIcon // 追加
+} from '@mui/icons-material';
 import { Anime, Genre } from '../types';
+import { useCustomLists } from '../context/CustomListContext'; // 追加
 
 // ジャンルごとの色を定義
 const genreColors: Record<Genre, string> = {
@@ -39,13 +47,38 @@ interface AnimeTableProps {
 }
 
 const AnimeTable: React.FC<AnimeTableProps> = ({ animeList, onEdit, onDelete, onRewatch }) => {
+  const { customLists, addAnimeToCustomList } = useCustomLists(); // 追加
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); // 追加
+  const [currentAnimeForMenu, setCurrentAnimeForMenu] = useState<Anime | null>(null); // 追加
+  const openMenu = Boolean(anchorEl); // 追加
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
+  // 追加: メニューハンドラ
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, anime: Anime) => {
+    setAnchorEl(event.currentTarget);
+    setCurrentAnimeForMenu(anime);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setCurrentAnimeForMenu(null);
+  };
+
+  const handleAddToListClick = (listId: string) => {
+    if (currentAnimeForMenu) {
+      addAnimeToCustomList(listId, currentAnimeForMenu.id);
+    }
+    handleMenuClose();
+    // ここでユーザーにフィードバック（例: Snackbar）を表示することも検討できます
+  };
+  // --- 追加ここまで ---
+
   return (
-    <TableContainer component={Paper}>
+    <> {/* MenuコンポーネントをTableContainerの外に置くためにFragmentを使用 */}
+      <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="アニメリスト">
         <TableHead>
           <TableRow>
@@ -124,6 +157,15 @@ const AnimeTable: React.FC<AnimeTableProps> = ({ animeList, onEdit, onDelete, on
                   </Typography>
                 </TableCell>
                 <TableCell align="center">
+                    {/* 追加: リストに追加ボタン */}
+                    <IconButton
+                      size="small"
+                      onClick={(event) => handleMenuOpen(event, anime)}
+                      title="リストに追加"
+                    >
+                      <PlaylistAddIcon fontSize="small" />
+                    </IconButton>
+                    {/* --- 追加ここまで --- */}
                   <IconButton size="small" onClick={() => onRewatch(anime.id)} title="再視聴">
                     <RefreshIcon fontSize="small" />
                   </IconButton>
@@ -140,6 +182,32 @@ const AnimeTable: React.FC<AnimeTableProps> = ({ animeList, onEdit, onDelete, on
         </TableBody>
       </Table>
     </TableContainer>
+      {/* 追加: Menuコンポーネント */}
+      <Menu
+        anchorEl={anchorEl}
+        open={openMenu}
+        onClose={handleMenuClose}
+        MenuListProps={{
+          'aria-labelledby': 'add-to-list-button-table',
+        }}
+      >
+        {customLists.length > 0 ? (
+          customLists.map((list) => (
+            <MenuItem key={list.id} onClick={() => handleAddToListClick(list.id)}>
+              {list.name}
+            </MenuItem>
+          ))
+        ) : (
+          <MenuItem disabled>カスタムリストがありません</MenuItem>
+        )}
+        {customLists.length > 0 && currentAnimeForMenu && (
+           <MenuItem disabled sx={{ fontStyle: 'italic', fontSize: '0.8rem', justifyContent: 'center' }}>
+             「{currentAnimeForMenu.title}」をリストに追加
+           </MenuItem>
+        )}
+      </Menu>
+      {/* --- 追加ここまで --- */}
+    </>
   );
 };
 
