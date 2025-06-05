@@ -10,8 +10,7 @@ import {
   OutlinedInput,
   SelectChangeEvent,
   IconButton,
-  Tooltip,
-  useTheme as useMuiTheme
+  Tooltip
 } from '@mui/material';
 import {
   ViewModule as CardViewIcon,
