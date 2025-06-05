@@ -78,7 +78,25 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
   }, [animeList, filters]);
 
   // アニメを追加
-  const addAnime = (anime: Omit<Anime, 'id'>) => {
+  const addAnime = async (anime: Omit<Anime, 'id'>) => { // async を追加
+    // カバー画像が指定されていない場合、Jikan APIで検索して設定
+    if (!anime.coverImage && anime.title) {
+      try {
+        const response = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(anime.title)}&limit=1`);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.data && result.data.length > 0 && result.data[0].images?.jpg?.image_url) {
+            anime.coverImage = result.data[0].images.jpg.image_url;
+            console.log(`Jikan APIから画像を取得しました: ${anime.coverImage}`);
+          }
+        } else {
+          console.error('Jikan APIリクエストエラー:', response.status, await response.text());
+        }
+      } catch (error) {
+        console.error('Jikan API呼び出し中にエラーが発生しました:', error);
+      }
+    }
+
     const newAnime = storage.addAnime(anime);
     setAnimeList(prev => [...prev, newAnime]);
   };

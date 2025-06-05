@@ -96,7 +96,7 @@ const HomePage: React.FC = () => {
     setFormOpen(false);
   };
 
-  const handleFormSave = (animeData: Omit<Anime, 'id'> | Anime) => {
+  const handleFormSave = async (animeData: Anime | Omit<Anime, 'id'>) => {
     if ('id' in animeData) {
       updateAnime(animeData);
       setSnackbar({
@@ -105,7 +105,7 @@ const HomePage: React.FC = () => {
         severity: 'success'
       });
     } else {
-      addAnime(animeData);
+      await addAnime(animeData as Omit<Anime, 'id'>); // await を追加
       setSnackbar({
         open: true,
         message: '新しいアニメが追加されました',
