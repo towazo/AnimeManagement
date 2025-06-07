@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Anime, AnimeFilters, Genre, SortOption, ViewMode } from '../types';
 import * as storage from '../utils/storage';
+import { getOfficialTitle, normalizeForSearch } from '../utils/animeAliases';
 
 interface AnimeContextType {
   animeList: Anime[];
@@ -48,10 +49,20 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
     // 検索語でフィルタリング
     if (filters.searchTerm) {
       const searchTermLower = filters.searchTerm.toLowerCase();
+      // 検索語が略称の場合、正式名称も検索対象にする
+      const officialTitle = getOfficialTitle(filters.searchTerm).toLowerCase();
+      
       result = result.filter(
-        anime => 
-          anime.title.toLowerCase().includes(searchTermLower) || 
-          (anime.notes && anime.notes.toLowerCase().includes(searchTermLower))
+        anime => {
+          // タイトル検索
+          const titleMatch = anime.title.toLowerCase().includes(searchTermLower) ||
+                            anime.title.toLowerCase().includes(officialTitle);
+          
+          // メモ検索
+          const notesMatch = anime.notes && anime.notes.toLowerCase().includes(searchTermLower);
+          
+          return titleMatch || notesMatch;
+        }
       );
     }
     
@@ -82,40 +93,22 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
   const addAnime = async (anime: Omit<Anime, 'id'>): Promise<{ success: boolean; message?: string; anime?: Anime }> => { // 戻り値の型を変更
     console.log('addAnime関数が呼び出されました', anime);
     
-    // 既存のアニメと重複していないか確認
-    // タイトル比較用の正規化関数
-    const normalizeTitle = (title: string): string => {
-      // 類似漢字のマッピング表
-      const similarKanjiMap: Record<string, string> = {
-        '嘘': '噂', // 嘘(官常用漢字の「嘘」) -> 噂(異体字の「噂」)
-        '噂': '嘘', // 噂(異体字の「噂」) -> 嘘(官常用漢字の「嘘」)
-        '浄': '浜', // 浄 -> 浜
-        '浜': '浄', // 浜 -> 浄
-        '会': '會', // 会 -> 會
-        '會': '会', // 會 -> 会
-        '学': '學', // 学 -> 學
-        '學': '学'  // 學 -> 学
-        // 必要に応じて他の類似漢字も追加可能
-      };
-      
-      // 類似漢字を標準化
-      let normalized = title.toLowerCase();
-      for (const [from, to] of Object.entries(similarKanjiMap)) {
-        normalized = normalized.replace(new RegExp(from, 'g'), to);
-      }
-      
-      return normalized
-        .replace(/\s+/g, '') // 空白文字を除去
-        .replace(/[\u3000\s\t\n\r]/g, '') // 全角空白やタブ、改行を除去
-        .replace(/[\!\?\u3001\u3002\uff01\uff1f]/g, '') // 句読点や特殊文字を除去
-        .trim();
-    };
+    // 略称が入力された場合、正式名称に変換
+    const originalTitle = anime.title;
+    const officialTitle = getOfficialTitle(anime.title);
     
-    const normalizedNewTitle = normalizeTitle(anime.title);
+    // 略称が正式名称に変換された場合、タイトルを更新
+    if (originalTitle !== officialTitle) {
+      console.log(`略称「${originalTitle}」を正式名称「${officialTitle}」に変換しました`);
+      anime.title = officialTitle;
+    }
+    
+    // 既存のアニメと重複していないか確認
+    const normalizedNewTitle = normalizeForSearch(anime.title);
     
     // 正規化したタイトルで比較
     const isDuplicate = animeList.some(existingAnime => {
-      const normalizedExistingTitle = normalizeTitle(existingAnime.title);
+      const normalizedExistingTitle = normalizeForSearch(existingAnime.title);
       return normalizedExistingTitle === normalizedNewTitle;
     });
     
@@ -282,9 +275,9 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
     );
   };
   
-  // 複数アニメを一度に追加する関数
-  const addBulkAnime = async (animes: Omit<Anime, 'id'>[]) => {
-    console.log('複数アニメ追加開始:', animes.length, '件');
+  // 複数アニメを一括追加
+  const addBulkAnime = async (animes: Omit<Anime, 'id'>[]): Promise<void> => {
+    console.log('複数アニメ追加関数が呼び出されました', animes);
     
     const results = {
       success: 0,
@@ -294,6 +287,16 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
     
     // 各アニメを順番に処理するために非同期処理を直列化
     for (const anime of animes) {
+      // 略称が入力された場合、正式名称に変換
+      const originalTitle = anime.title;
+      const officialTitle = getOfficialTitle(anime.title);
+      
+      // 略称が正式名称に変換された場合、タイトルを更新
+      if (originalTitle !== officialTitle) {
+        console.log(`略称「${originalTitle}」を正式名称「${officialTitle}」に変換しました`);
+        anime.title = officialTitle;
+      }
+      
       // 各アニメを個別に追加する前に、APIから情報を取得
       const result = await addAnime(anime);
       
