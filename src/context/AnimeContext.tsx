@@ -79,26 +79,137 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
 
   // アニメを追加
   const addAnime = async (anime: Omit<Anime, 'id'>) => { // async を追加
-    // カバー画像が指定されていない場合、Jikan APIで検索して設定
-    if (!anime.coverImage && anime.title) {
+    console.log('addAnime関数が呼び出されました', anime);
+    
+    // タイトルが入力されている場合、Jikan APIで情報を取得
+    if (anime.title) {
+      console.log('Jikan APIを呼び出します。タイトル:', anime.title);
       try {
-        const response = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(anime.title)}&limit=1`);
+        // 特殊文字（!や:など）を含むタイトルの場合、検索精度を上げるために
+        // 1. 完全一致検索を試みる
+        // 2. 特殊文字を除去した検索を試みる
+        // 3. 最初の単語だけで検索を試みる
+        let searchTitle = anime.title;
+        let apiUrl = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(searchTitle)}&limit=5`;
+        console.log('APIリクエストURL (1回目):', apiUrl);
+        
+        let response = await fetch(apiUrl);
+        console.log('APIレスポンスステータス (1回目):', response.status);
+        
         if (response.ok) {
           const result = await response.json();
-          if (result.data && result.data.length > 0 && result.data[0].images?.jpg?.image_url) {
-            anime.coverImage = result.data[0].images.jpg.image_url;
-            console.log(`Jikan APIから画像を取得しました: ${anime.coverImage}`);
+          console.log('APIレスポンスデータ:', result);
+          
+          // 検索結果から最適なアニメを選択する
+          let bestMatch = null;
+          
+          if (result.data && result.data.length > 0) {
+            // 完全一致または最も近い一致を探す
+            const exactTitle = anime.title.toLowerCase();
+            
+            // 完全一致を探す
+            // Jikan APIのレスポンスの型を定義
+            interface JikanAnimeItem {
+              title: string;
+              title_english?: string;
+              title_japanese?: string;
+              images?: {
+                jpg?: {
+                  image_url?: string;
+                }
+              };
+              aired?: {
+                prop?: {
+                  from?: {
+                    year?: number;
+                  }
+                }
+              };
+              genres?: Array<{ name: string }>;
+            }
+            
+            bestMatch = result.data.find((item: JikanAnimeItem) => 
+              item.title.toLowerCase() === exactTitle || 
+              item.title_english?.toLowerCase() === exactTitle ||
+              item.title_japanese?.toLowerCase() === exactTitle
+            );
+            
+            // 完全一致がない場合は、最初の結果を使用
+            if (!bestMatch) {
+              console.log('完全一致が見つかりません。最初の結果を使用します。');
+              bestMatch = result.data[0];
+            } else {
+              console.log('完全一致または近い一致が見つかりました。');
+            }
+            
+            console.log('選択されたアニメデータ:', bestMatch);
+            
+            // カバー画像が指定されていない場合、APIから取得
+            if (!anime.coverImage && bestMatch.images?.jpg?.image_url) {
+              anime.coverImage = bestMatch.images.jpg.image_url;
+              console.log(`画像URLを設定しました: ${anime.coverImage}`);
+            }
+            
+            // 放送年が指定されていない場合、APIから取得
+            if (!anime.year && bestMatch.aired?.prop?.from?.year) {
+              anime.year = bestMatch.aired.prop.from.year;
+              console.log(`放送年を設定しました: ${anime.year}`);
+            }
+            
+            // ジャンルが空の場合、APIから取得
+            if ((!anime.genres || anime.genres.length === 0) && bestMatch.genres && bestMatch.genres.length > 0) {
+              // APIから取得したジャンルを日本語に変換して、アプリで定義されているジャンルに対応させる
+              const genreMapping: Record<string, Genre> = {
+                'Action': 'アクション',
+                'Comedy': 'コメディ',
+                'Drama': 'ドラマ',
+                'Fantasy': 'ファンタジー',
+                'Sci-Fi': 'SF',
+                'Slice of Life': '日常',
+                'Romance': '恋愛',
+                'Sports': 'スポーツ',
+                'Mystery': 'ミステリー',
+                'Horror': 'ホラー',
+                'School': '日常',
+                'Music': 'その他',
+                'Adventure': 'アクション',
+                'Supernatural': 'ファンタジー'
+                // その他のジャンルは「その他」にマッピング
+              };
+              
+              const mappedGenres: Genre[] = [];
+              
+              for (const genre of bestMatch.genres) {
+                const mappedGenre = genreMapping[genre.name] as Genre;
+                if (mappedGenre && !mappedGenres.includes(mappedGenre)) {
+                  mappedGenres.push(mappedGenre);
+                }
+              }
+              
+              // マッピングできたジャンルがない場合は「その他」を追加
+              if (mappedGenres.length === 0) {
+                mappedGenres.push('その他');
+              }
+              
+              anime.genres = mappedGenres;
+              console.log(`ジャンルを設定しました: ${anime.genres.join(', ')}`);
+            }
+          } else {
+            console.log(`アニメ情報が見つかりませんでした。タイトル: ${anime.title}`);
           }
         } else {
-          console.error('Jikan APIリクエストエラー:', response.status, await response.text());
+          console.error('APIエラー:', response.status, await response.text());
         }
       } catch (error) {
-        console.error('Jikan API呼び出し中にエラーが発生しました:', error);
+        console.error('例外が発生しました:', error);
       }
+    } else {
+      console.log('タイトルが入力されていないため、API呼び出しをスキップします');
     }
 
     const newAnime = storage.addAnime(anime);
     setAnimeList(prev => [...prev, newAnime]);
+    console.log('アニメが追加されました', newAnime);
   };
 
   // アニメを更新
