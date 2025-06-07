@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/recommend-custom-list  # このブランチにプッシュがあった時に実行
+      - master  # masterブランチにプッシュがあった時も実行
 
 permissions:
   contents: write  # GitHub Pagesへのデプロイに必要な権限を追加
