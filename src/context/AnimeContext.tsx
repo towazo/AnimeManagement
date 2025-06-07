@@ -12,6 +12,7 @@ interface AnimeContextType {
   addBulkAnime: (animes: Omit<Anime, 'id'>[]) => Promise<void>; // 複数アニメ追加関数
   updateAnime: (anime: Anime) => void;
   deleteAnime: (id: string) => void;
+  deleteBulkAnime: (ids: string[]) => void; // 複数アニメ削除関数
   markAsRewatched: (id: string) => void;
   setSearchTerm: (term: string) => void;
   setSelectedGenres: (genres: Genre[]) => void;
@@ -263,6 +264,15 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
     storage.deleteAnime(id);
     setAnimeList(prev => prev.filter(anime => anime.id !== id));
   };
+  
+  // 複数アニメを削除
+  const deleteBulkAnime = (ids: string[]) => {
+    // 各IDをストレージから削除
+    ids.forEach(id => storage.deleteAnime(id));
+    
+    // リストから複数アニメを削除
+    setAnimeList(prev => prev.filter(anime => !ids.includes(anime.id)));
+  };
 
   // 再視聴としてマーク
   const markAsRewatched = (id: string) => {
@@ -368,6 +378,7 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
         addBulkAnime,
         updateAnime,
         deleteAnime,
+        deleteBulkAnime,
         markAsRewatched,
         setSearchTerm,
         setSelectedGenres,
