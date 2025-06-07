@@ -8,6 +8,7 @@ interface AnimeContextType {
   viewMode: ViewMode;
   filteredAnimeList: Anime[];
   addAnime: (anime: Omit<Anime, 'id'>) => void;
+  addBulkAnime: (animes: Omit<Anime, 'id'>[]) => Promise<void>; // 複数アニメ追加関数
   updateAnime: (anime: Anime) => void;
   deleteAnime: (id: string) => void;
   markAsRewatched: (id: string) => void;
@@ -234,6 +235,22 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
       )
     );
   };
+  
+  // 複数アニメを一度に追加する関数
+  const addBulkAnime = async (animes: Omit<Anime, 'id'>[]) => {
+    console.log('複数アニメ追加開始:', animes.length, '件');
+    
+    // 各アニメを順番に処理するために非同期処理を直列化
+    for (const anime of animes) {
+      // 各アニメを個別に追加する前に、APIから情報を取得
+      await addAnime(anime);
+      
+      // APIのレート制限を避けるために少し間隔を空ける
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
+    console.log('複数アニメ追加完了');
+  };
 
   // 検索語を設定
   const setSearchTerm = (term: string) => {
@@ -278,6 +295,7 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
         viewMode,
         filteredAnimeList,
         addAnime,
+        addBulkAnime,
         updateAnime,
         deleteAnime,
         markAsRewatched,

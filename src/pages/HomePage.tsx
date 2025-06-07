@@ -12,13 +12,16 @@ import {
   DialogTitle,
   Fab,
   Snackbar,
-  Alert
+  Alert,
+  Menu,
+  MenuItem
 } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+import { Add as AddIcon, ArrowDropDown as ArrowDropDownIcon } from '@mui/icons-material';
 import { useAnime } from '../context/AnimeContext';
 import AnimeCard from '../components/AnimeCard';
 import AnimeTable from '../components/AnimeTable';
 import AnimeForm from '../components/AnimeForm';
+import BulkAnimeForm from '../components/BulkAnimeForm';
 import FilterBar from '../components/FilterBar';
 import ImportExportDialog from '../components/ImportExportDialog';
 import { Anime } from '../types';
@@ -29,6 +32,7 @@ const HomePage: React.FC = () => {
     filters,
     viewMode,
     addAnime,
+    addBulkAnime,
     updateAnime,
     deleteAnime,
     markAsRewatched,
@@ -41,10 +45,12 @@ const HomePage: React.FC = () => {
   } = useAnime();
 
   const [formOpen, setFormOpen] = useState(false);
+  const [bulkFormOpen, setBulkFormOpen] = useState(false);
   const [selectedAnime, setSelectedAnime] = useState<Anime | undefined>(undefined);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [animeToDelete, setAnimeToDelete] = useState<string | null>(null);
   const [importExportOpen, setImportExportOpen] = useState(false);
+  const [addMenuAnchorEl, setAddMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -55,9 +61,23 @@ const HomePage: React.FC = () => {
     severity: 'success'
   });
 
+  const handleAddMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAddMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleAddMenuClose = () => {
+    setAddMenuAnchorEl(null);
+  };
+
   const handleAddClick = () => {
     setSelectedAnime(undefined);
     setFormOpen(true);
+    handleAddMenuClose();
+  };
+  
+  const handleBulkAddClick = () => {
+    setBulkFormOpen(true);
+    handleAddMenuClose();
   };
 
   const handleEditClick = (anime: Anime) => {
@@ -105,14 +125,33 @@ const HomePage: React.FC = () => {
         severity: 'success'
       });
     } else {
-      await addAnime(animeData as Omit<Anime, 'id'>); // await を追加
+      await addAnime(animeData);
       setSnackbar({
         open: true,
-        message: '新しいアニメが追加されました',
+        message: 'アニメが追加されました',
         severity: 'success'
       });
     }
     setFormOpen(false);
+  };
+
+  const handleBulkFormSave = async (animesData: Omit<Anime, 'id'>[]) => {
+    try {
+      await addBulkAnime(animesData);
+      setSnackbar({
+        open: true,
+        message: `${animesData.length}件のアニメが追加されました`,
+        severity: 'success'
+      });
+    } catch (error) {
+      console.error('複数アニメ追加エラー:', error);
+      setSnackbar({
+        open: true,
+        message: '一部のアニメの追加に失敗しました',
+        severity: 'error'
+      });
+    }
+    setBulkFormOpen(false);
   };
 
   const handleImportExportOpen = () => {
@@ -189,20 +228,48 @@ const HomePage: React.FC = () => {
         />
       )}
 
-      <Fab
-        color="primary"
-        aria-label="add"
-        onClick={handleAddClick}
-        sx={{ position: 'fixed', bottom: 16, right: 16 }}
-      >
-        <AddIcon />
-      </Fab>
+      <Box sx={{ position: 'fixed', bottom: 16, right: 16, display: 'flex', flexDirection: 'column' }}>
+        <Fab
+          color="primary"
+          aria-label="add"
+          aria-controls="add-menu"
+          aria-haspopup="true"
+          onClick={handleAddMenuClick}
+          sx={{ mb: addMenuAnchorEl ? 1 : 0 }}
+        >
+          <AddIcon />
+          <ArrowDropDownIcon sx={{ ml: -1, fontSize: '1.2rem' }} />
+        </Fab>
+        <Menu
+          id="add-menu"
+          anchorEl={addMenuAnchorEl}
+          open={Boolean(addMenuAnchorEl)}
+          onClose={handleAddMenuClose}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+        >
+          <MenuItem onClick={handleAddClick}>アニメを追加</MenuItem>
+          <MenuItem onClick={handleBulkAddClick}>複数アニメをまとめて追加</MenuItem>
+        </Menu>
+      </Box>
 
       <AnimeForm
         open={formOpen}
         onClose={handleFormClose}
         onSave={handleFormSave}
         anime={selectedAnime}
+      />
+      
+      <BulkAnimeForm
+        open={bulkFormOpen}
+        onClose={() => setBulkFormOpen(false)}
+        onSave={handleBulkFormSave}
       />
 
       <Dialog
