@@ -104,7 +104,9 @@ const AnimeForm: React.FC<AnimeFormProps> = ({ open, onClose, onSave, anime }) =
       newErrors.title = 'タイトルは必須です';
     }
 
-    if (formData.genres.length === 0) {
+    // タイトルが入力されていない場合のみ、ジャンルの必須チェックを行う
+    // タイトルが入力されている場合は、APIからジャンルを自動取得するため、ジャンルが空でもOK
+    if (formData.genres.length === 0 && !formData.title.trim()) {
       newErrors.genres = '少なくとも1つのジャンルを選択してください';
     }
 
