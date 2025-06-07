@@ -17,7 +17,8 @@ import {
   MenuItem,
   Checkbox,
   IconButton,
-  Tooltip
+  Tooltip,
+  Pagination,
 } from '@mui/material';
 import { 
   Add as AddIcon, 
@@ -77,6 +78,10 @@ const HomePage: React.FC = () => {
     severity: 'success'
   });
 
+  // ページネーション関連の状態
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12; // 1ページあたりの表示数
+
   const handleAddMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAddMenuAnchorEl(event.currentTarget);
   };
@@ -135,6 +140,7 @@ const HomePage: React.FC = () => {
       setSelectedAnimeIds([]);
     }
     setSelectionMode(!selectionMode);
+    setCurrentPage(1); // 選択モード切替時にページを1に戻す
   };
   
   // アニメの選択状態を切り替え
@@ -369,8 +375,11 @@ const HomePage: React.FC = () => {
           </Button>
         </Box>
       ) : viewMode === 'card' ? (
-        <Grid container spacing={3}>
-          {filteredAnimeList.map((anime) => (
+        <>
+          <Grid container spacing={3}>
+            {filteredAnimeList
+              .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+              .map((anime) => (
             <Grid item key={anime.id} xs={12} sm={6} md={4}>
               <Box sx={{ position: 'relative' }}>
                 {selectionMode && (
@@ -398,17 +407,42 @@ const HomePage: React.FC = () => {
               </Box>
             </Grid>
           ))}
-        </Grid>
+          </Grid>
+          {filteredAnimeList.length > itemsPerPage && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
+              <Pagination 
+                count={Math.ceil(filteredAnimeList.length / itemsPerPage)} 
+                page={currentPage} 
+                onChange={(event, value) => setCurrentPage(value)}
+                color="primary"
+                size="large"
+              />
+            </Box>
+          )}
+        </>
       ) : (
-        <AnimeTable
-          animeList={filteredAnimeList}
-          onEdit={selectionMode ? undefined : handleEditClick}
-          onDelete={selectionMode ? undefined : handleDeleteClick}
-          onRewatch={selectionMode ? undefined : handleRewatchClick}
-          selectionMode={selectionMode}
-          selectedAnimeIds={selectedAnimeIds}
-          onToggleSelection={toggleAnimeSelection}
-        />
+        <>
+          <AnimeTable
+            animeList={filteredAnimeList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)}
+            onEdit={selectionMode ? undefined : handleEditClick}
+            onDelete={selectionMode ? undefined : handleDeleteClick}
+            onRewatch={selectionMode ? undefined : handleRewatchClick}
+            selectionMode={selectionMode}
+            selectedAnimeIds={selectedAnimeIds}
+            onToggleSelection={toggleAnimeSelection}
+          />
+          {filteredAnimeList.length > itemsPerPage && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
+              <Pagination 
+                count={Math.ceil(filteredAnimeList.length / itemsPerPage)} 
+                page={currentPage} 
+                onChange={(event, value) => setCurrentPage(value)}
+                color="primary"
+                size="large"
+              />
+            </Box>
+          )}
+        </>
       )}
 
       <Box sx={{ position: 'fixed', bottom: 16, right: 16, display: 'flex', flexDirection: 'column' }}>
