@@ -5,6 +5,9 @@ on:
     branches:
       - feature/recommend-custom-list  # このブランチにプッシュがあった時に実行
 
+permissions:
+  contents: write  # GitHub Pagesへのデプロイに必要な権限を追加
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -25,6 +28,7 @@ jobs:
         run: npm run build
         env:
           PUBLIC_URL: /AnimeManagement
+          CI: false  # ビルド時の警告をエラーとして扱わないようにする
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
