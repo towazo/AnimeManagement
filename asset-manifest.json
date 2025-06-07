@@ -1,12 +1,12 @@
 {
   "files": {
-    "main.js": "/AnimeManagement/static/js/main.ff2fb308.js",
+    "main.js": "/AnimeManagement/static/js/main.cb7249ba.js",
     "static/js/453.f7fa55c8.chunk.js": "/AnimeManagement/static/js/453.f7fa55c8.chunk.js",
     "index.html": "/AnimeManagement/index.html",
-    "main.ff2fb308.js.map": "/AnimeManagement/static/js/main.ff2fb308.js.map",
+    "main.cb7249ba.js.map": "/AnimeManagement/static/js/main.cb7249ba.js.map",
     "453.f7fa55c8.chunk.js.map": "/AnimeManagement/static/js/453.f7fa55c8.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.ff2fb308.js"
+    "static/js/main.cb7249ba.js"
   ]
 }
