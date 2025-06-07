@@ -323,19 +323,17 @@ const HomePage: React.FC = () => {
               <Button
                 variant="contained"
                 color="primary"
-                startIcon={<ArrowDropDownIcon />}
-                onClick={handleAddMenuClick}
+                onClick={handleAddClick}
               >
                 アニメを追加
               </Button>
-              <Menu
-                anchorEl={addMenuAnchorEl}
-                open={Boolean(addMenuAnchorEl)}
-                onClose={handleAddMenuClose}
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleBulkAddClick}
               >
-                <MenuItem onClick={handleAddClick}>個別追加</MenuItem>
-                <MenuItem onClick={handleBulkAddClick}>一括追加</MenuItem>
-              </Menu>
+                一括追加
+              </Button>
             </>
           )}
         </Box>
