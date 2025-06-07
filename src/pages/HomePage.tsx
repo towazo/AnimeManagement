@@ -23,7 +23,9 @@ import {
   Add as AddIcon, 
   ArrowDropDown as ArrowDropDownIcon,
   DeleteSweep as DeleteSweepIcon,
-  Close as CloseIcon
+  Close as CloseIcon,
+  SelectAll as SelectAllIcon,
+  ClearAll as ClearAllIcon
 } from '@mui/icons-material';
 import { useAnime } from '../context/AnimeContext';
 import AnimeCard from '../components/AnimeCard';
@@ -146,6 +148,17 @@ const HomePage: React.FC = () => {
     });
   };
   
+  // すべてのアニメを選択
+  const selectAllAnime = () => {
+    const allAnimeIds = filteredAnimeList.map(anime => anime.id);
+    setSelectedAnimeIds(allAnimeIds);
+  };
+  
+  // すべての選択を解除
+  const clearAllSelection = () => {
+    setSelectedAnimeIds([]);
+  };
+  
   // 複数削除ボタンのクリックハンドラ
   const handleBulkDeleteClick = () => {
     if (selectedAnimeIds.length > 0) {
@@ -262,6 +275,28 @@ const HomePage: React.FC = () => {
               >
                 選択モードを終了
               </Button>
+              <Tooltip title="すべて選択">
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<SelectAllIcon />}
+                  onClick={selectAllAnime}
+                  disabled={filteredAnimeList.length === 0 || selectedAnimeIds.length === filteredAnimeList.length}
+                >
+                  すべて選択
+                </Button>
+              </Tooltip>
+              <Tooltip title="選択解除">
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<ClearAllIcon />}
+                  onClick={clearAllSelection}
+                  disabled={selectedAnimeIds.length === 0}
+                >
+                  選択解除
+                </Button>
+              </Tooltip>
               <Tooltip title="選択したアニメを削除">
                 <Button
                   variant="contained"
