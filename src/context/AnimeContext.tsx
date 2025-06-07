@@ -85,8 +85,26 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
     // 既存のアニメと重複していないか確認
     // タイトル比較用の正規化関数
     const normalizeTitle = (title: string): string => {
-      return title
-        .toLowerCase()
+      // 類似漢字のマッピング表
+      const similarKanjiMap: Record<string, string> = {
+        '嘘': '噂', // 嘘(官常用漢字の「嘘」) -> 噂(異体字の「噂」)
+        '噂': '嘘', // 噂(異体字の「噂」) -> 嘘(官常用漢字の「嘘」)
+        '浄': '浜', // 浄 -> 浜
+        '浜': '浄', // 浜 -> 浄
+        '会': '會', // 会 -> 會
+        '會': '会', // 會 -> 会
+        '学': '學', // 学 -> 學
+        '學': '学'  // 學 -> 学
+        // 必要に応じて他の類似漢字も追加可能
+      };
+      
+      // 類似漢字を標準化
+      let normalized = title.toLowerCase();
+      for (const [from, to] of Object.entries(similarKanjiMap)) {
+        normalized = normalized.replace(new RegExp(from, 'g'), to);
+      }
+      
+      return normalized
         .replace(/\s+/g, '') // 空白文字を除去
         .replace(/[\u3000\s\t\n\r]/g, '') // 全角空白やタブ、改行を除去
         .replace(/[\!\?\u3001\u3002\uff01\uff1f]/g, '') // 句読点や特殊文字を除去
