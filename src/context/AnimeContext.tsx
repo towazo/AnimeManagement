@@ -83,9 +83,23 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
     console.log('addAnime関数が呼び出されました', anime);
     
     // 既存のアニメと重複していないか確認
-    const isDuplicate = animeList.some(existingAnime => 
-      existingAnime.title.toLowerCase() === anime.title.toLowerCase()
-    );
+    // タイトル比較用の正規化関数
+    const normalizeTitle = (title: string): string => {
+      return title
+        .toLowerCase()
+        .replace(/\s+/g, '') // 空白文字を除去
+        .replace(/[\u3000\s\t\n\r]/g, '') // 全角空白やタブ、改行を除去
+        .replace(/[\!\?\u3001\u3002\uff01\uff1f]/g, '') // 句読点や特殊文字を除去
+        .trim();
+    };
+    
+    const normalizedNewTitle = normalizeTitle(anime.title);
+    
+    // 正規化したタイトルで比較
+    const isDuplicate = animeList.some(existingAnime => {
+      const normalizedExistingTitle = normalizeTitle(existingAnime.title);
+      return normalizedExistingTitle === normalizedNewTitle;
+    });
     
     if (isDuplicate) {
       console.log('重複するアニメが見つかりました:', anime.title);
