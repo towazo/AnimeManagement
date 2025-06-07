@@ -33,12 +33,14 @@ const genreColors: Record<Genre, string> = {
 
 interface AnimeCardProps {
   anime: Anime;
-  onEdit: (anime: Anime) => void;
-  onDelete: (id: string) => void;
-  onRewatch: (id: string) => void;
+  onEdit: ((anime: Anime) => void) | undefined;
+  onDelete: ((id: string) => void) | undefined;
+  onRewatch: ((id: string) => void) | undefined;
+  onClick?: () => void; // カードクリック時のハンドラを追加
+  selected?: boolean; // 選択状態を追加
 }
 
-const AnimeCard: React.FC<AnimeCardProps> = ({ anime, onEdit, onDelete, onRewatch }) => {
+const AnimeCard: React.FC<AnimeCardProps> = ({ anime, onEdit, onDelete, onRewatch, onClick, selected = false }) => {
   const { customLists, addAnimeToCustomList } = useCustomLists(); // 追加
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); // 追加
   const open = Boolean(anchorEl); // 追加
@@ -64,15 +66,21 @@ const AnimeCard: React.FC<AnimeCardProps> = ({ anime, onEdit, onDelete, onRewatc
   // --- 追加ここまで ---
 
   return (
-    <Card sx={{ 
-      height: '100%', 
-      display: 'flex', 
-      flexDirection: 'column',
-      transition: 'transform 0.2s',
-      '&:hover': {
-        transform: 'scale(1.02)'
-      }
-    }}>
+    <Card 
+      sx={{
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: 'column',
+        transition: 'transform 0.2s, border 0.2s',
+        '&:hover': {
+          transform: 'scale(1.02)'
+        },
+        border: selected ? '2px solid #1976d2' : 'none',
+        position: 'relative',
+        cursor: onClick ? 'pointer' : 'default'
+      }}
+      onClick={onClick}
+    >
       <CardMedia
         component="img"
         height="200"
@@ -146,15 +154,21 @@ const AnimeCard: React.FC<AnimeCardProps> = ({ anime, onEdit, onDelete, onRewatc
           )}
         </Menu>
         {/* --- 追加ここまで --- */}
-        <IconButton size="small" onClick={() => onRewatch(anime.id)} title="再視聴">
-          <RefreshIcon />
-        </IconButton>
-        <IconButton size="small" onClick={() => onEdit(anime)} title="編集">
-          <EditIcon />
-        </IconButton>
-        <IconButton size="small" onClick={() => onDelete(anime.id)} title="削除">
-          <DeleteIcon />
-        </IconButton>
+        {onRewatch && (
+          <IconButton size="small" onClick={() => onRewatch(anime.id)} title="再視聴">
+            <RefreshIcon />
+          </IconButton>
+        )}
+        {onEdit && (
+          <IconButton size="small" onClick={() => onEdit(anime)} title="編集">
+            <EditIcon />
+          </IconButton>
+        )}
+        {onDelete && (
+          <IconButton size="small" onClick={() => onDelete(anime.id)} title="削除">
+            <DeleteIcon />
+          </IconButton>
+        )}
       </CardActions>
     </Card>
   );

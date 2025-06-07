@@ -14,9 +14,17 @@ import {
   Snackbar,
   Alert,
   Menu,
-  MenuItem
+  MenuItem,
+  Checkbox,
+  IconButton,
+  Tooltip
 } from '@mui/material';
-import { Add as AddIcon, ArrowDropDown as ArrowDropDownIcon } from '@mui/icons-material';
+import { 
+  Add as AddIcon, 
+  ArrowDropDown as ArrowDropDownIcon,
+  DeleteSweep as DeleteSweepIcon,
+  Close as CloseIcon
+} from '@mui/icons-material';
 import { useAnime } from '../context/AnimeContext';
 import AnimeCard from '../components/AnimeCard';
 import AnimeTable from '../components/AnimeTable';
@@ -35,6 +43,7 @@ const HomePage: React.FC = () => {
     addBulkAnime,
     updateAnime,
     deleteAnime,
+    deleteBulkAnime,
     markAsRewatched,
     setSearchTerm,
     setSelectedGenres,
@@ -51,6 +60,11 @@ const HomePage: React.FC = () => {
   const [animeToDelete, setAnimeToDelete] = useState<string | null>(null);
   const [importExportOpen, setImportExportOpen] = useState(false);
   const [addMenuAnchorEl, setAddMenuAnchorEl] = useState<null | HTMLElement>(null);
+  
+  // 複数選択モードの状態管理
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedAnimeIds, setSelectedAnimeIds] = useState<string[]>([]);
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -110,6 +124,47 @@ const HomePage: React.FC = () => {
       message: '再視聴としてマークされました',
       severity: 'success'
     });
+  };
+  
+  // 複数選択モードの切り替え
+  const toggleSelectionMode = () => {
+    if (selectionMode) {
+      // 選択モードを終了する場合は選択をクリア
+      setSelectedAnimeIds([]);
+    }
+    setSelectionMode(!selectionMode);
+  };
+  
+  // アニメの選択状態を切り替え
+  const toggleAnimeSelection = (id: string) => {
+    setSelectedAnimeIds(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(animeId => animeId !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+  
+  // 複数削除ボタンのクリックハンドラ
+  const handleBulkDeleteClick = () => {
+    if (selectedAnimeIds.length > 0) {
+      setBulkDeleteDialogOpen(true);
+    }
+  };
+  
+  // 複数削除の確定処理
+  const handleConfirmBulkDelete = () => {
+    if (selectedAnimeIds.length > 0) {
+      deleteBulkAnime(selectedAnimeIds);
+      setSnackbar({
+        open: true,
+        message: `${selectedAnimeIds.length}件のアニメが削除されました`,
+        severity: 'success'
+      });
+      setSelectedAnimeIds([]);
+    }
+    setBulkDeleteDialogOpen(false);
   };
 
   const handleFormClose = () => {
@@ -196,9 +251,59 @@ const HomePage: React.FC = () => {
         <Typography variant="h4" component="h1">
           アニメアーカイブ
         </Typography>
-        <Button variant="outlined" onClick={handleImportExportOpen}>
-          インポート/エクスポート
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          {selectionMode ? (
+            <>
+              <Button 
+                variant="outlined" 
+                color="primary"
+                startIcon={<CloseIcon />}
+                onClick={toggleSelectionMode}
+              >
+                選択モードを終了
+              </Button>
+              <Tooltip title="選択したアニメを削除">
+                <Button
+                  variant="contained"
+                  color="error"
+                  startIcon={<DeleteSweepIcon />}
+                  onClick={handleBulkDeleteClick}
+                  disabled={selectedAnimeIds.length === 0}
+                >
+                  {selectedAnimeIds.length}件を削除
+                </Button>
+              </Tooltip>
+            </>
+          ) : (
+            <>
+              <Button 
+                variant="outlined" 
+                onClick={toggleSelectionMode}
+              >
+                複数選択モード
+              </Button>
+              <Button variant="outlined" onClick={handleImportExportOpen}>
+                インポート/エクスポート
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<ArrowDropDownIcon />}
+                onClick={handleAddMenuClick}
+              >
+                アニメを追加
+              </Button>
+              <Menu
+                anchorEl={addMenuAnchorEl}
+                open={Boolean(addMenuAnchorEl)}
+                onClose={handleAddMenuClose}
+              >
+                <MenuItem onClick={handleAddClick}>個別追加</MenuItem>
+                <MenuItem onClick={handleBulkAddClick}>一括追加</MenuItem>
+              </Menu>
+            </>
+          )}
+        </Box>
       </Box>
 
       <FilterBar
@@ -234,21 +339,42 @@ const HomePage: React.FC = () => {
         <Grid container spacing={3}>
           {filteredAnimeList.map((anime) => (
             <Grid item key={anime.id} xs={12} sm={6} md={4}>
-              <AnimeCard
-                anime={anime}
-                onEdit={handleEditClick}
-                onDelete={handleDeleteClick}
-                onRewatch={handleRewatchClick}
-              />
+              <Box sx={{ position: 'relative' }}>
+                {selectionMode && (
+                  <Checkbox
+                    checked={selectedAnimeIds.includes(anime.id)}
+                    onChange={() => toggleAnimeSelection(anime.id)}
+                    sx={{
+                      position: 'absolute',
+                      top: 8,
+                      left: 8,
+                      zIndex: 1,
+                      backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                      borderRadius: '50%'
+                    }}
+                  />
+                )}
+                <AnimeCard
+                  anime={anime}
+                  onEdit={selectionMode ? undefined : handleEditClick}
+                  onDelete={selectionMode ? undefined : handleDeleteClick}
+                  onRewatch={selectionMode ? undefined : handleRewatchClick}
+                  onClick={selectionMode ? () => toggleAnimeSelection(anime.id) : undefined}
+                  selected={selectionMode && selectedAnimeIds.includes(anime.id)}
+                />
+              </Box>
             </Grid>
           ))}
         </Grid>
       ) : (
         <AnimeTable
           animeList={filteredAnimeList}
-          onEdit={handleEditClick}
-          onDelete={handleDeleteClick}
-          onRewatch={handleRewatchClick}
+          onEdit={selectionMode ? undefined : handleEditClick}
+          onDelete={selectionMode ? undefined : handleDeleteClick}
+          onRewatch={selectionMode ? undefined : handleRewatchClick}
+          selectionMode={selectionMode}
+          selectedAnimeIds={selectedAnimeIds}
+          onToggleSelection={toggleAnimeSelection}
         />
       )}
 
@@ -309,6 +435,30 @@ const HomePage: React.FC = () => {
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)}>キャンセル</Button>
           <Button onClick={handleConfirmDelete} color="error" autoFocus>
+            削除
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 複数削除確認ダイアログ */}
+      <Dialog
+        open={bulkDeleteDialogOpen}
+        onClose={() => setBulkDeleteDialogOpen(false)}
+        aria-labelledby="bulk-delete-dialog-title"
+      >
+        <DialogTitle id="bulk-delete-dialog-title">
+          複数アニメの削除
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            選択した{selectedAnimeIds.length}件のアニメを削除します。この操作は元に戻せません。
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBulkDeleteDialogOpen(false)} color="primary">
+            キャンセル
+          </Button>
+          <Button onClick={handleConfirmBulkDelete} color="error" autoFocus>
             削除
           </Button>
         </DialogActions>

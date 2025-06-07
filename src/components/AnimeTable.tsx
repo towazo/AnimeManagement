@@ -13,7 +13,8 @@ import {
   IconButton,
   Typography,
   Menu, // 追加
-  MenuItem // 追加
+  MenuItem, // 追加
+  Checkbox // 追加
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -41,12 +42,23 @@ const genreColors: Record<Genre, string> = {
 
 interface AnimeTableProps {
   animeList: Anime[];
-  onEdit: (anime: Anime) => void;
-  onDelete: (id: string) => void;
-  onRewatch: (id: string) => void;
+  onEdit: ((anime: Anime) => void) | undefined;
+  onDelete: ((id: string) => void) | undefined;
+  onRewatch: ((id: string) => void) | undefined;
+  selectionMode?: boolean;
+  selectedAnimeIds?: string[];
+  onToggleSelection?: (id: string) => void;
 }
 
-const AnimeTable: React.FC<AnimeTableProps> = ({ animeList, onEdit, onDelete, onRewatch }) => {
+const AnimeTable: React.FC<AnimeTableProps> = ({ 
+  animeList, 
+  onEdit, 
+  onDelete, 
+  onRewatch,
+  selectionMode = false,
+  selectedAnimeIds = [],
+  onToggleSelection
+}) => {
   const { customLists, addAnimeToCustomList } = useCustomLists(); // 追加
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); // 追加
   const [currentAnimeForMenu, setCurrentAnimeForMenu] = useState<Anime | null>(null); // 追加
@@ -82,6 +94,9 @@ const AnimeTable: React.FC<AnimeTableProps> = ({ animeList, onEdit, onDelete, on
       <Table sx={{ minWidth: 650 }} aria-label="アニメリスト">
         <TableHead>
           <TableRow>
+            {selectionMode && (
+              <TableCell padding="checkbox" align="center">選択</TableCell>
+            )}
             <TableCell>タイトル</TableCell>
             <TableCell align="center">年</TableCell>
             <TableCell align="center">ジャンル</TableCell>
@@ -104,8 +119,22 @@ const AnimeTable: React.FC<AnimeTableProps> = ({ animeList, onEdit, onDelete, on
             animeList.map((anime) => (
               <TableRow
                 key={anime.id}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                sx={{
+                  '&:last-child td, &:last-child th': { border: 0 },
+                  ...(selectionMode && selectedAnimeIds.includes(anime.id) ? { backgroundColor: 'rgba(25, 118, 210, 0.08)' } : {})
+                }}
+                onClick={selectionMode && onToggleSelection ? () => onToggleSelection(anime.id) : undefined}
+                hover={!!selectionMode}
               >
+                {selectionMode && (
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedAnimeIds.includes(anime.id)}
+                      onChange={() => onToggleSelection && onToggleSelection(anime.id)}
+                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => e.stopPropagation()}
+                    />
+                  </TableCell>
+                )}
                 <TableCell component="th" scope="row">
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     {anime.coverImage && (
@@ -166,15 +195,21 @@ const AnimeTable: React.FC<AnimeTableProps> = ({ animeList, onEdit, onDelete, on
                       <PlaylistAddIcon fontSize="small" />
                     </IconButton>
                     {/* --- 追加ここまで --- */}
-                  <IconButton size="small" onClick={() => onRewatch(anime.id)} title="再視聴">
-                    <RefreshIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton size="small" onClick={() => onEdit(anime)} title="編集">
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton size="small" onClick={() => onDelete(anime.id)} title="削除">
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
+                  {onRewatch && (
+                    <IconButton size="small" onClick={() => onRewatch(anime.id)} title="再視聴">
+                      <RefreshIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                  {onEdit && (
+                    <IconButton size="small" onClick={() => onEdit(anime)} title="編集">
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                  {onDelete && (
+                    <IconButton size="small" onClick={() => onDelete(anime.id)} title="削除">
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  )}
                 </TableCell>
               </TableRow>
             ))
