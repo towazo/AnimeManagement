@@ -124,15 +124,27 @@ const HomePage: React.FC = () => {
         message: 'アニメが更新されました',
         severity: 'success'
       });
+      setFormOpen(false);
     } else {
-      await addAnime(animeData);
-      setSnackbar({
-        open: true,
-        message: 'アニメが追加されました',
-        severity: 'success'
-      });
+      const result = await addAnime(animeData);
+      
+      if (result.success) {
+        setSnackbar({
+          open: true,
+          message: 'アニメが追加されました',
+          severity: 'success'
+        });
+        setFormOpen(false);
+      } else {
+        // 重複エラーの場合
+        setSnackbar({
+          open: true,
+          message: result.message || 'アニメの追加に失敗しました',
+          severity: 'warning'
+        });
+        // フォームは閉じないでおく
+      }
     }
-    setFormOpen(false);
   };
 
   const handleBulkFormSave = async (animesData: Omit<Anime, 'id'>[]) => {
@@ -143,15 +155,27 @@ const HomePage: React.FC = () => {
         message: `${animesData.length}件のアニメが追加されました`,
         severity: 'success'
       });
-    } catch (error) {
+      setBulkFormOpen(false);
+    } catch (error: any) {
       console.error('複数アニメ追加エラー:', error);
-      setSnackbar({
-        open: true,
-        message: '一部のアニメの追加に失敗しました',
-        severity: 'error'
-      });
+      
+      // 重複エラーの場合は、エラーメッセージを表示
+      if (error.message && error.message.includes('重複')) {
+        setSnackbar({
+          open: true,
+          message: error.message,
+          severity: 'warning'
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: '一部のアニメの追加に失敗しました',
+          severity: 'error'
+        });
+      }
+      // エラーがあってもフォームを閉じる
+      setBulkFormOpen(false);
     }
-    setBulkFormOpen(false);
   };
 
   const handleImportExportOpen = () => {

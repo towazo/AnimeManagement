@@ -7,7 +7,7 @@ interface AnimeContextType {
   filters: AnimeFilters;
   viewMode: ViewMode;
   filteredAnimeList: Anime[];
-  addAnime: (anime: Omit<Anime, 'id'>) => void;
+  addAnime: (anime: Omit<Anime, 'id'>) => Promise<{ success: boolean; message?: string; anime?: Anime }>;
   addBulkAnime: (animes: Omit<Anime, 'id'>[]) => Promise<void>; // 複数アニメ追加関数
   updateAnime: (anime: Anime) => void;
   deleteAnime: (id: string) => void;
@@ -79,8 +79,21 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
   }, [animeList, filters]);
 
   // アニメを追加
-  const addAnime = async (anime: Omit<Anime, 'id'>) => { // async を追加
+  const addAnime = async (anime: Omit<Anime, 'id'>): Promise<{ success: boolean; message?: string; anime?: Anime }> => { // 戻り値の型を変更
     console.log('addAnime関数が呼び出されました', anime);
+    
+    // 既存のアニメと重複していないか確認
+    const isDuplicate = animeList.some(existingAnime => 
+      existingAnime.title.toLowerCase() === anime.title.toLowerCase()
+    );
+    
+    if (isDuplicate) {
+      console.log('重複するアニメが見つかりました:', anime.title);
+      return { 
+        success: false, 
+        message: `「${anime.title}」はすでにリストに追加されています` 
+      };
+    }
     
     // タイトルが入力されている場合、Jikan APIで情報を取得
     if (anime.title) {
@@ -211,6 +224,7 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
     const newAnime = storage.addAnime(anime);
     setAnimeList(prev => [...prev, newAnime]);
     console.log('アニメが追加されました', newAnime);
+    return { success: true, anime: newAnime };
   };
 
   // アニメを更新
@@ -240,16 +254,37 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
   const addBulkAnime = async (animes: Omit<Anime, 'id'>[]) => {
     console.log('複数アニメ追加開始:', animes.length, '件');
     
+    const results = {
+      success: 0,
+      duplicates: 0,
+      duplicatesList: [] as string[]
+    };
+    
     // 各アニメを順番に処理するために非同期処理を直列化
     for (const anime of animes) {
       // 各アニメを個別に追加する前に、APIから情報を取得
-      await addAnime(anime);
+      const result = await addAnime(anime);
+      
+      if (result.success) {
+        results.success++;
+      } else {
+        results.duplicates++;
+        if (result.message) {
+          results.duplicatesList.push(anime.title);
+        }
+      }
       
       // APIのレート制限を避けるために少し間隔を空ける
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
     
-    console.log('複数アニメ追加完了');
+    console.log('複数アニメ追加完了', results);
+    
+    // 結果を返す
+    if (results.duplicates > 0) {
+      const duplicatesMessage = results.duplicatesList.join('\n');
+      throw new Error(`${results.duplicates}件のアニメが重複しています:\n${duplicatesMessage}`);
+    }
   };
 
   // 検索語を設定
