@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Typography,
@@ -81,6 +81,11 @@ const HomePage: React.FC = () => {
   // ページネーション関連の状態
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12; // 1ページあたりの表示数
+  
+  // 検索やフィルターが変更されたときにページを1に戻す
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters.searchTerm, filters.selectedGenres, filters.sortBy]);
 
   const handleAddMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAddMenuAnchorEl(event.currentTarget);
@@ -355,6 +360,15 @@ const HomePage: React.FC = () => {
         onSortChange={setSortBy}
         onViewModeToggle={toggleViewMode}
       />
+      
+      {/* 検索結果の件数表示 */}
+      {filters.searchTerm && (
+        <Box sx={{ mt: 1, mb: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            「{filters.searchTerm}」の検索結果: {filteredAnimeList.length}件
+          </Typography>
+        </Box>
+      )}
 
       {filteredAnimeList.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 8 }}>
