@@ -1,25 +1,47 @@
 import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography, IconButton, CircularProgress } from '@mui/material';
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography, CircularProgress, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useGemini } from '../hooks/useGemini';
+import TowazoBubble from './TowazoBubble';
+
+interface ImageIdentifyDialogProps {
+  open: boolean;
+  onClose: () => void;
+}
 
 interface AnimeResult {
   title: string;
   confidencePercent: number;
 }
 
-interface Props {
-  open: boolean;
-  onClose: () => void;
-}
+// towazoの口調でコメントを生成する関数
+const generateTowazoComment = (result: AnimeResult): string => {
+  const { title, confidencePercent } = result;
+  
+  if (confidencePercent >= 90) {
+    return `やったね！この画像は「${title}」だと思うよ〜！\n僕の自信度は${confidencePercent}%だから、かなり確信してるね！`;
+  } else if (confidencePercent >= 70) {
+    return `うーん、この画像は「${title}」かな？\n${confidencePercent}%くらいの確信度だから、たぶん合ってると思うよ！`;
+  } else {
+    return `ちょっと難しいけど、「${title}」かもしれないね〜\n${confidencePercent}%の確信度だから、もしかしたら違うかも...でも頑張って推測したよ！`;
+  }
+};
 
-const ImageIdentifyDialog: React.FC<Props> = ({ open, onClose }) => {
+const ImageIdentifyDialog: React.FC<ImageIdentifyDialogProps> = ({ open, onClose }) => {
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<string>('');
   const [parsedResult, setParsedResult] = useState<AnimeResult | null>(null);
   const [error, setError] = useState<string>('');
   const { loading, imageIdentify } = useGemini();
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
 
   const handleClose = () => {
     setFile(null);
@@ -60,17 +82,17 @@ const ImageIdentifyDialog: React.FC<Props> = ({ open, onClose }) => {
         }
       } catch (err) {
         console.error('JSON解析エラー:', err);
-        setError('結果の解析に失敗しました');
+        setError('ごめんね〜結果の解析でエラーが起きちゃった！もう一度試してみてね！');
       }
     } else {
-      setError('エラーが発生しました。時間を置いて再試行してください。');
+      setError('うーん、エラーが起きちゃった！少し時間を置いてもう一度試してみてね〜');
     }
   };
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
       <DialogTitle>
-        画像から作品推定
+        towazo の画像識別
         <IconButton sx={{ position: 'absolute', right: 8, top: 8 }} onClick={handleClose}>
           <CloseIcon />
         </IconButton>
@@ -86,39 +108,49 @@ const ImageIdentifyDialog: React.FC<Props> = ({ open, onClose }) => {
             <img src={URL.createObjectURL(file)} alt="preview" style={{ maxWidth: '100%', marginTop: 8 }} />
           </Box>
         )}
-        {loading && <CircularProgress />}
-        {parsedResult && (
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle1">推定結果</Typography>
-            <Typography variant="h6" sx={{ mt: 1 }}>{parsedResult.title}</Typography>
-            <Typography variant="body2" sx={{ mt: 0.5 }}>信頼度: {parsedResult.confidencePercent}%</Typography>
-          </Box>
+        
+        {!parsedResult && !error && !loading && file && (
+          <TowazoBubble>
+            画像をアップロードしてくれてありがとう！<br />
+            「判定」ボタンを押すと、僕が画像を見てアニメ作品を推測するよ〜<br />
+            どんな作品か楽しみだね！
+          </TowazoBubble>
         )}
+        
+        {loading && (
+          <TowazoBubble>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CircularProgress size={16} />
+              <Typography variant="body2">画像を一生懸命見てるよ〜</Typography>
+            </Box>
+          </TowazoBubble>
+        )}
+        
+        {parsedResult && (
+          <TowazoBubble>
+            {generateTowazoComment(parsedResult)}
+          </TowazoBubble>
+        )}
+        
         {error && (
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle1" color="error">{error}</Typography>
-          </Box>
+          <TowazoBubble>
+            <Typography color="error">{error}</Typography>
+          </TowazoBubble>
         )}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>閉じる</Button>
-        <Button onClick={handleIdentify} variant="contained" disabled={!file || loading}>判定</Button>
+        <Button 
+          variant="contained" 
+          onClick={handleIdentify} 
+          disabled={!file || loading}
+          sx={{ minWidth: 80 }}
+        >
+          {loading ? <CircularProgress size={20} color="inherit" /> : '判定'}
+        </Button>
       </DialogActions>
     </Dialog>
   );
 };
 
 export default ImageIdentifyDialog;
-
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      // remove data URI prefix
-      resolve(result.split(',')[1]);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}

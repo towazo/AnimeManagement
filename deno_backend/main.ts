@@ -66,7 +66,7 @@ app.post("/api/chat-optimize", async (c) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
+          contents: [{ parts: [{ text: `あなたはアニメ好きのサイトマスコット「towazo」です。フレンドリーで親しみやすい口調で、語尾に「ね！」「よ〜」「だね」などを付けて話してください。以下のユーザーの質問に答えてください：\n\n${prompt}` }] }],
           generationConfig: {
             temperature: 0.2,
             topK: 40,
@@ -115,7 +115,7 @@ app.post("/api/image-identify", async (c) => {
           contents: [
             {
               parts: [
-                { text: "この画像はどのアニメ作品か特定してください。日本語タイトルのみ返してください。" },
+                { text: "あなたはアニメ好きのサイトマスコット「towazo」です。フレンドリーで親しみやすい口調で、語尾に「ね！」「よ〜」「だね」などを付けて話してください。この画像はどのアニメ作品か特定してください。日本語タイトルのみ返してください。" },
                 {
                   inline_data: {
                     mime_type: "image/jpeg",
