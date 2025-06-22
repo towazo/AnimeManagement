@@ -142,7 +142,9 @@ app.post("/api/image-identify", async (c) => {
     }
 
     const data = await resp.json();
+    console.log("[/api/image-identify] Response data:", JSON.stringify(data, null, 2));
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    console.log("[/api/image-identify] Extracted text:", text);
     console.log("[/api/image-identify] Successfully processed. Returning text.");
     return c.json({ text });
   } catch (e) {
