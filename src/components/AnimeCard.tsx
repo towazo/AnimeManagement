@@ -84,7 +84,7 @@ const AnimeCard: React.FC<AnimeCardProps> = ({ anime, onEdit, onDelete, onRewatc
       <CardMedia
         component="img"
         height="200"
-        image={anime.coverImage || 'https://via.placeholder.com/300x200?text=No+Image'}
+        image={anime.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'}
         alt={anime.title}
         sx={{ objectFit: 'cover' }}
       />

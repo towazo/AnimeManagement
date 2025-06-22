@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { Anime, Genre } from '../types';
 
 const STORAGE_KEY = 'anime_archive_data';
@@ -12,7 +13,7 @@ const sampleAnimeData: Anime[] = [
     personalRating: 5,
     notes: '壁の中の人類と巨人との戦い',
     watchedDate: '2023-01-15',
-    coverImage: 'https://cdn.myanimelist.net/images/anime/10/47347.jpg'
+    imageUrl: 'https://cdn.myanimelist.net/images/anime/10/47347.jpg'
   },
   {
     id: '2',
@@ -22,7 +23,7 @@ const sampleAnimeData: Anime[] = [
     personalRating: 4,
     notes: '元軍人の少女が「愛してる」という言葉の意味を探す旅',
     watchedDate: '2022-11-20',
-    coverImage: 'https://cdn.myanimelist.net/images/anime/1329/90618.jpg'
+    imageUrl: 'https://cdn.myanimelist.net/images/anime/1329/90618.jpg'
   },
   {
     id: '3',
@@ -32,7 +33,7 @@ const sampleAnimeData: Anime[] = [
     personalRating: 4,
     notes: '家族を鬼に殺された少年が鬼殺隊に入隊',
     watchedDate: '2022-05-10',
-    coverImage: 'https://cdn.myanimelist.net/images/anime/1286/99889.jpg'
+    imageUrl: 'https://cdn.myanimelist.net/images/anime/1286/99889.jpg'
   },
   {
     id: '4',
@@ -42,7 +43,7 @@ const sampleAnimeData: Anime[] = [
     personalRating: 5,
     notes: '5歳の女の子よつばの日常',
     watchedDate: '2023-03-22',
-    coverImage: 'https://cdn.myanimelist.net/images/manga/5/259524.jpg'
+    imageUrl: 'https://cdn.myanimelist.net/images/manga/5/259524.jpg'
   },
   {
     id: '5',
@@ -52,7 +53,7 @@ const sampleAnimeData: Anime[] = [
     personalRating: 4,
     notes: 'スパイ、殺し屋、超能力者が偽装家族を結成',
     watchedDate: '2023-02-05',
-    coverImage: 'https://cdn.myanimelist.net/images/anime/1441/122795.jpg'
+    imageUrl: 'https://cdn.myanimelist.net/images/anime/1441/122795.jpg'
   }
 ];
 
@@ -77,14 +78,12 @@ export const saveAnimeList = (animeList: Anime[]): void => {
 // 新しいアニメを追加する
 export const addAnime = (anime: Omit<Anime, 'id'>): Anime => {
   const animeList = getAnimeList();
-  const newAnime = {
+  const newAnime: Anime = {
     ...anime,
-    id: Date.now().toString()
+    id: uuidv4(),
   };
-  
   animeList.push(newAnime);
   saveAnimeList(animeList);
-  
   return newAnime;
 };
 

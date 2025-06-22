@@ -14,12 +14,12 @@ export type Genre =
 export interface Anime {
   id: string;
   title: string;
+  imageUrl?: string;
   year?: number;
   genres: Genre[];
   personalRating: number;
   notes?: string;
   watchedDate: string;
-  coverImage?: string;
 }
 
 export type SortOption = 'watchedDate_desc' | 'title_asc' | 'personalRating_desc';

@@ -137,10 +137,10 @@ const AnimeTable: React.FC<AnimeTableProps> = ({
                 )}
                 <TableCell component="th" scope="row">
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {anime.coverImage && (
+                    {anime.imageUrl && (
                       <Box
                         component="img"
-                        src={anime.coverImage}
+                        src={anime.imageUrl}
                         alt={anime.title}
                         sx={{ width: 40, height: 40, mr: 2, objectFit: 'cover', borderRadius: 1 }}
                       />

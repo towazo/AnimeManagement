@@ -47,7 +47,7 @@ const initialAnime: Omit<Anime, 'id'> = {
   personalRating: 3,
   notes: '',
   watchedDate: new Date().toISOString().split('T')[0],
-  coverImage: ''
+  imageUrl: ''
 };
 
 const AnimeForm: React.FC<AnimeFormProps> = ({ open, onClose, onSave, anime }) => {
@@ -141,11 +141,19 @@ const AnimeForm: React.FC<AnimeFormProps> = ({ open, onClose, onSave, anime }) =
             variant="outlined"
             value={formData.title}
             onChange={handleChange}
+            onBlur={() => console.log('タイトル欄からフォーカスが外れました')}
             error={!!errors.title}
             helperText={errors.title}
             required
           />
-
+          <TextField
+            name="imageUrl"
+            label="画像URL"
+            value={formData.imageUrl || ''}
+            onChange={handleChange}
+            fullWidth
+            margin="dense"
+          />
           <TextField
             margin="dense"
             name="year"
@@ -215,12 +223,12 @@ const AnimeForm: React.FC<AnimeFormProps> = ({ open, onClose, onSave, anime }) =
 
           <TextField
             margin="dense"
-            name="coverImage"
+            name="imageUrl"
             label="カバー画像URL"
             type="url"
             fullWidth
             variant="outlined"
-            value={formData.coverImage || ''}
+            value={formData.imageUrl || ''}
             onChange={handleChange}
             placeholder="https://example.com/image.jpg"
           />

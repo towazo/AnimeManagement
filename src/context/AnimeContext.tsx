@@ -22,7 +22,7 @@ interface AnimeContextType {
   importData: (jsonData: string) => boolean;
 }
 
-const AnimeContext = createContext<AnimeContextType | undefined>(undefined);
+export const AnimeContext = createContext<AnimeContextType | undefined>(undefined);
 
 interface AnimeProviderProps {
   children: ReactNode;
@@ -184,10 +184,10 @@ export const AnimeProvider: React.FC<AnimeProviderProps> = ({ children }) => {
             
             console.log('選択されたアニメデータ:', bestMatch);
             
-            // カバー画像が指定されていない場合、APIから取得
-            if (!anime.coverImage && bestMatch.images?.jpg?.image_url) {
-              anime.coverImage = bestMatch.images.jpg.image_url;
-              console.log(`画像URLを設定しました: ${anime.coverImage}`);
+            // 画像URLが指定されていない場合、APIから取得
+            if (!anime.imageUrl && bestMatch.images?.jpg?.image_url) {
+              anime.imageUrl = bestMatch.images.jpg.image_url;
+              console.log(`画像URLを設定しました: ${anime.imageUrl}`);
             }
             
             // 放送年が指定されていない場合、APIから取得

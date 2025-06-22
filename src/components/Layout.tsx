@@ -1,103 +1,118 @@
-import React from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import {
   AppBar,
   Box,
+  CssBaseline,
+  Drawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
   Toolbar,
   Typography,
-  Button,
-  Container,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
 } from '@mui/material';
 import {
+  Menu as MenuIcon,
   Home as HomeIcon,
+  Book as ArchiveIcon,
   BarChart as StatsIcon,
-  Movie as MovieIcon,
-  ListAlt as ListAltIcon // 追加
+  List as ListIcon,
+  AutoAwesome as AIIcon,
 } from '@mui/icons-material';
+
+const drawerWidth = 240;
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
+const navItems = [
+  { text: 'ホーム', icon: <HomeIcon />, link: '/' },
+  { text: 'アニメアーカイブ', icon: <ArchiveIcon />, link: '/archive' },
+  { text: '統計', icon: <StatsIcon />, link: '/stats' },
+  { text: 'カスタムリスト', icon: <ListIcon />, link: '/custom-lists' },
+  { text: 'AIアシスタント', icon: <AIIcon />, link: '/ai-tools' },
+];
+
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const drawer = (
+    <div>
+      <Toolbar />
+      <List>
+        {navItems.map((item) => (
+          <ListItem key={item.text} disablePadding>
+            <ListItemButton component={NavLink} to={item.link} onClick={isMobile ? handleDrawerToggle : undefined}>
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </div>
+  );
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="static" color="primary">
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <AppBar
+        position="fixed"
+        sx={{ 
+          width: { md: `calc(100% - ${drawerWidth}px)` }, 
+          ml: { md: `${drawerWidth}px` },
+         }}
+      >
         <Toolbar>
-          <MovieIcon sx={{ mr: 1 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{ mr: 2, display: { md: 'none' } }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap component="div">
             アニメアーカイブナビゲーター
           </Typography>
-          <Box sx={{ display: 'flex' }}>
-            <Button
-              component={RouterLink}
-              to="/"
-              color="inherit"
-              startIcon={!isMobile && <HomeIcon />}
-              sx={{ 
-                fontWeight: location.pathname === '/' ? 'bold' : 'normal',
-                borderBottom: location.pathname === '/' ? '2px solid white' : 'none'
-              }}
-            >
-              {isMobile ? <HomeIcon /> : 'ホーム'}
-            </Button>
-            <Button
-              component={RouterLink}
-              to="/stats"
-              color="inherit"
-              startIcon={!isMobile && <StatsIcon />}
-              sx={{ 
-                fontWeight: location.pathname === '/stats' ? 'bold' : 'normal',
-                borderBottom: location.pathname === '/stats' ? '2px solid white' : 'none'
-              }}
-            >
-              {isMobile ? <StatsIcon /> : '統計'}
-            </Button>
-            {/* 追加ここから */}
-            <Button
-              component={RouterLink}
-              to="/custom-lists"
-              color="inherit"
-              startIcon={!isMobile && <ListAltIcon />}
-              sx={{
-                fontWeight: location.pathname === '/custom-lists' ? 'bold' : 'normal',
-                borderBottom: location.pathname === '/custom-lists' ? '2px solid white' : 'none'
-              }}
-            >
-              {isMobile ? <ListAltIcon /> : 'カスタムリスト'}
-            </Button>
-            {/* 追加ここまで */}
-          </Box>
         </Toolbar>
       </AppBar>
-
-      <Box component="main" sx={{ flexGrow: 1, py: 3 }}>
-        {children}
-      </Box>
-
       <Box
-        component="footer"
-        sx={{
-          py: 3,
-          px: 2,
-          mt: 'auto',
-          backgroundColor: (theme) =>
-            theme.palette.mode === 'light'
-              ? theme.palette.grey[200]
-              : theme.palette.grey[800],
-        }}
+        component="nav"
+        sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
       >
-        <Container maxWidth="sm">
-          <Typography variant="body2" color="text.secondary" align="center">
-            © {new Date().getFullYear()} アニメアーカイブナビゲーター
-          </Typography>
-        </Container>
+        <Drawer
+          variant={isMobile ? 'temporary' : 'permanent'}
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          }}
+        >
+          {drawer}
+        </Drawer>
+      </Box>
+      <Box
+        component="main"
+        sx={{ flexGrow: 1, p: 3, width: { md: `calc(100% - ${drawerWidth}px)` } }}
+      >
+        <Toolbar />
+        {children}
       </Box>
     </Box>
   );
