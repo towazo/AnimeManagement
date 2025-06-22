@@ -1,8 +1,22 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-// APIキーを環境変数から取得（Create React Appの場合はprocess.envを使用）
-const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || '';
+// デバッグ用に環境変数をログ出力
+console.log('環境変数確認:', {
+  NODE_ENV: process.env.NODE_ENV,
+  PUBLIC_URL: process.env.PUBLIC_URL,
+  // APIキーの存在確認（値は表示しない）
+  HAS_API_KEY: !!process.env.REACT_APP_GEMINI_API_KEY
+});
+
+// APIキーを環境変数から取得（フォールバックとしてデモ用キーを設定）
+// 本番環境では必ずGitHubのSecretsにREACT_APP_GEMINI_API_KEYを設定すること
+// デモ用キーは制限付きですぐに使用不可になる可能性があります
+const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyDhGO9FLQmDTKKYX_qY6_-o_-GNJyWS-6c';
+
+// CORS問題を回避するためのプロキシURL
+const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+
 // Gemini APIのエンドポイント
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 const GEMINI_PRO_MODEL = 'gemini-pro';
@@ -18,9 +32,15 @@ export const useGemini = () => {
       setError(null);
       console.log('チャット最適化リクエスト送信:', prompt.slice(0, 30) + '...');
       
-      // Gemini Pro APIを直接呼び出し
+      // デバッグ用にリクエスト情報をログ出力
+      console.log(`APIキーの長さ: ${API_KEY.length}文字`);
+      
+      // Gemini Pro APIを呼び出し（CORSプロキシ経由）
+      const apiUrl = `${GEMINI_API_URL}/${GEMINI_PRO_MODEL}:generateContent?key=${API_KEY}`;
+      console.log('リクエストURL:', apiUrl);
+      
       const response = await axios.post(
-        `${GEMINI_API_URL}/${GEMINI_PRO_MODEL}:generateContent?key=${API_KEY}`,
+        apiUrl,
         {
           contents: [
             {
@@ -61,9 +81,15 @@ export const useGemini = () => {
       // 画像データからBase64ヘッダーを削除（もしあれば）
       const base64Data = imageBase64.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
       
-      // Gemini Vision APIを直接呼び出し
+      // デバッグ用にリクエスト情報をログ出力
+      console.log(`画像識別: APIキーの長さ: ${API_KEY.length}文字`);
+      
+      // Gemini Vision APIを呼び出し（CORSプロキシ経由）
+      const apiUrl = `${GEMINI_API_URL}/${GEMINI_VISION_MODEL}:generateContent?key=${API_KEY}`;
+      console.log('画像識別リクエストURL:', apiUrl);
+      
       const response = await axios.post(
-        `${GEMINI_API_URL}/${GEMINI_VISION_MODEL}:generateContent?key=${API_KEY}`,
+        apiUrl,
         {
           contents: [
             {
