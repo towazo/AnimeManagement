@@ -47,7 +47,7 @@ const AIToolsPage: React.FC = () => {
               <Typography color="text.secondary" sx={{ mb: 2 }}>
                 僕 towazo と一緒にアニメについて話そう！<br />
                 「今期のおすすめ教えて」「5本だけ選んで」など、<br />
-                何でも気軽に相談してね〜
+                何でも気軽に相談してね。
               </Typography>
               <Button 
                 variant="contained" 
@@ -82,7 +82,7 @@ const AIToolsPage: React.FC = () => {
               <Typography color="text.secondary" sx={{ mb: 2 }}>
                 アニメの画像をアップロードしてくれれば、<br />
                 僕が作品名を推測するよ！<br />
-                スクリーンショットでも何でもOKだね〜
+                スクリーンショットでも何でもOKだよ。
               </Typography>
               <Button 
                 variant="contained" 

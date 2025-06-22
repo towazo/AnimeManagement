@@ -12,20 +12,15 @@ interface ChatPanelProps {
 
 // towazoの口調に変換する関数
 const convertToTowazoStyle = (text: string): string => {
-  // 基本的な変換ルール
+  // 自然でフレンドリーな変換ルール
   let converted = text
-    .replace(/です。/g, 'だね！')
-    .replace(/ます。/g, 'るね！')
-    .replace(/でしょう。/g, 'だと思うよ！')
-    .replace(/おすすめします/g, 'おすすめするね')
-    .replace(/いかがでしょうか/g, 'どうかな')
+    .replace(/です。/g, 'だよ。')
+    .replace(/ます。/g, 'るよ。')
+    .replace(/でしょう。/g, 'だと思う。')
+    .replace(/おすすめします/g, 'おすすめするよ')
+    .replace(/いかがでしょうか/g, 'どうかな？')
     .replace(/ください/g, 'してね')
-    .replace(/^/, 'やあ！towazoだよ〜 ');
-  
-  // 末尾に親しみやすさを追加
-  if (!converted.endsWith('ね！') && !converted.endsWith('よ！') && !converted.endsWith('〜')) {
-    converted += 'ね！';
-  }
+    .replace(/^/, 'towazoだよ！ ');
   
   return converted;
 };
@@ -35,7 +30,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ open, onClose }) => {
   const [messages, setMessages] = useState<{ role: 'user' | 'ai'; text: string }[]>([
     { 
       role: 'ai', 
-      text: 'やあ！僕はtowazoだよ〜 アニメのことなら何でも聞いてね！「今期のおすすめ教えて」「5本だけ選んで」みたいに気軽に話しかけてよ！'
+      text: 'towazoだよ！ アニメのことなら何でも聞いてね！「今期のおすすめ教えて」「5本だけ選んで」みたいに気軽に話しかけてよ！'
     }
   ]);
   const { loading, chatOptimize } = useGemini();
@@ -51,7 +46,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ open, onClose }) => {
       const towazoText = convertToTowazoStyle(aiText);
       setMessages((prev) => [...prev, { role: 'ai', text: towazoText }]);
     } else {
-      setMessages((prev) => [...prev, { role: 'ai', text: 'ごめんね〜エラーが起きちゃった！少し時間を置いてもう一度試してみてね！' }]);
+      setMessages((prev) => [...prev, { role: 'ai', text: 'ごめん、エラーが起きちゃった。少し時間を置いてもう一度試してみて！' }]);
     }
   };
 

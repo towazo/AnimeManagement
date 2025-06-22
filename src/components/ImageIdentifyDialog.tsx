@@ -14,16 +14,32 @@ interface AnimeResult {
   confidencePercent: number;
 }
 
+// HTMLタグを除去し、作品名を抽出する関数
+const extractAnimeTitle = (text: string): string => {
+  // HTMLタグを除去
+  const withoutHtml = text.replace(/<[^>]*>/g, '');
+  
+  // 「」で囲まれた作品名を抽出
+  const titleMatch = withoutHtml.match(/「([^」]+)」/);
+  if (titleMatch) {
+    return titleMatch[1];
+  }
+  
+  // 「」がない場合は、最初の行または短いテキストを返す
+  const firstLine = withoutHtml.split('\n')[0];
+  return firstLine.length > 50 ? 'アニメ作品' : firstLine;
+};
+
 // towazoの口調でコメントを生成する関数
 const generateTowazoComment = (result: AnimeResult): string => {
   const { title, confidencePercent } = result;
   
   if (confidencePercent >= 90) {
-    return `やったね！この画像は「${title}」だと思うよ〜！\n僕の自信度は${confidencePercent}%だから、かなり確信してるね！`;
+    return `やった！この画像は「${title}」だと思うよ！\n僕の自信度は${confidencePercent}%だから、かなり確信してる。`;
   } else if (confidencePercent >= 70) {
-    return `うーん、この画像は「${title}」かな？\n${confidencePercent}%くらいの確信度だから、たぶん合ってると思うよ！`;
+    return `うーん、この画像は「${title}」かな？\n${confidencePercent}%くらいの確信度だから、たぶん合ってると思うよ。`;
   } else {
-    return `ちょっと難しいけど、「${title}」かもしれないね〜\n${confidencePercent}%の確信度だから、もしかしたら違うかも...でも頑張って推測したよ！`;
+    return `ちょっと難しいけど、「${title}」かもしれないね。\n${confidencePercent}%の確信度だから、もしかしたら違うかも...でも頑張って推測したよ！`;
   }
 };
 
@@ -78,14 +94,15 @@ const ImageIdentifyDialog: React.FC<ImageIdentifyDialogProps> = ({ open, onClose
           setParsedResult(parsed);
         } else {
           // JSON形式以外のプレーンテキストを処理する
-          setParsedResult({ title: text, confidencePercent: 100 });
+          const title = extractAnimeTitle(text);
+          setParsedResult({ title, confidencePercent: 100 });
         }
       } catch (err) {
         console.error('JSON解析エラー:', err);
-        setError('ごめんね〜結果の解析でエラーが起きちゃった！もう一度試してみてね！');
+        setError('ごめん、結果の解析でエラーが起きちゃった。もう一度試してみて！');
       }
     } else {
-      setError('うーん、エラーが起きちゃった！少し時間を置いてもう一度試してみてね〜');
+      setError('うーん、エラーが起きちゃった。少し時間を置いてもう一度試してみて。');
     }
   };
 
@@ -112,7 +129,7 @@ const ImageIdentifyDialog: React.FC<ImageIdentifyDialogProps> = ({ open, onClose
         {!parsedResult && !error && !loading && file && (
           <TowazoBubble>
             画像をアップロードしてくれてありがとう！<br />
-            「判定」ボタンを押すと、僕が画像を見てアニメ作品を推測するよ〜<br />
+            「判定」ボタンを押すと、僕が画像を見てアニメ作品を推測するよ。<br />
             どんな作品か楽しみだね！
           </TowazoBubble>
         )}
