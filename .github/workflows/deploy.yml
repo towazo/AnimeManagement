@@ -29,7 +29,8 @@ jobs:
         run: npm run build
         env:
           PUBLIC_URL: /AnimeManagement
-          CI: false  # ビルド時の警告をエラーとして扱わないようにする
+          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
+          CI: false
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
