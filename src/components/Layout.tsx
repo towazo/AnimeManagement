@@ -36,7 +36,7 @@ const navItems = [
   { text: 'アニメアーカイブ', icon: <ArchiveIcon />, link: '/archive' },
   { text: '統計', icon: <StatsIcon />, link: '/stats' },
   { text: 'カスタムリスト', icon: <ListIcon />, link: '/custom-lists' },
-  { text: 'AIアシスタント', icon: <AIIcon />, link: '/ai-tools' },
+  { text: 'towazo アシスタント', icon: <AIIcon />, link: '/ai-tools' },
 ];
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {

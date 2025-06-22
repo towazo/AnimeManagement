@@ -13,14 +13,14 @@ const BubbleContainer = styled(Box)(({ theme }) => ({
 }));
 
 const BubbleContent = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.light,
-  color: theme.palette.primary.contrastText,
+  backgroundColor: '#E3F2FD',
+  color: '#1565C0',
   padding: theme.spacing(2),
   borderRadius: '16px 16px 16px 4px',
   position: 'relative',
   maxWidth: '80%',
-  boxShadow: theme.shadows[2],
-  border: `2px solid ${theme.palette.primary.main}`,
+  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+  border: '2px solid #42A5F5',
   [theme.breakpoints.down('sm')]: {
     padding: theme.spacing(1.5),
     maxWidth: '85%',
@@ -34,7 +34,7 @@ const BubbleContent = styled(Box)(({ theme }) => ({
     height: 0,
     borderStyle: 'solid',
     borderWidth: '0 8px 8px 0',
-    borderColor: `transparent ${theme.palette.primary.main} transparent transparent`,
+    borderColor: 'transparent #42A5F5 transparent transparent',
   },
   '&::after': {
     content: '""',
@@ -45,7 +45,7 @@ const BubbleContent = styled(Box)(({ theme }) => ({
     height: 0,
     borderStyle: 'solid',
     borderWidth: '0 6px 6px 0',
-    borderColor: `transparent ${theme.palette.primary.light} transparent transparent`,
+    borderColor: 'transparent #E3F2FD transparent transparent',
   },
 }));
 
@@ -53,16 +53,18 @@ const TowazoBubble: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   return (
     <BubbleContainer>
       <Avatar
-        src="/towazo-icon.svg"
+        src="/towazo-mascot.png"
         alt="サイトマスコット towazo のイラスト"
         sx={{
-          width: { xs: 40, sm: 48 },
-          height: { xs: 40, sm: 48 },
+          width: { xs: 48, sm: 56 },
+          height: { xs: 48, sm: 56 },
           flexShrink: 0,
+          border: '2px solid #42A5F5',
+          backgroundColor: '#FFF8E1',
         }}
       />
       <BubbleContent>
-        <Typography variant="body1" component="div">
+        <Typography variant="body1" component="div" sx={{ lineHeight: 1.6 }}>
           {children}
         </Typography>
       </BubbleContent>

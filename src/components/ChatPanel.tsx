@@ -32,7 +32,12 @@ const convertToTowazoStyle = (text: string): string => {
 
 const ChatPanel: React.FC<ChatPanelProps> = ({ open, onClose }) => {
   const [prompt, setPrompt] = useState('');
-  const [messages, setMessages] = useState<{ role: 'user' | 'ai'; text: string }[]>([]);
+  const [messages, setMessages] = useState<{ role: 'user' | 'ai'; text: string }[]>([
+    { 
+      role: 'ai', 
+      text: 'やあ！僕はtowazoだよ〜 アニメのことなら何でも聞いてね！「今期のおすすめ教えて」「5本だけ選んで」みたいに気軽に話しかけてよ！'
+    }
+  ]);
   const { loading, chatOptimize } = useGemini();
 
   const handleSend = async () => {
@@ -58,13 +63,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ open, onClose }) => {
           <IconButton onClick={onClose} size="small"><CloseIcon /></IconButton>
         </Box>
         <List sx={{ flexGrow: 1, overflowY: 'auto', px: 0 }}>
-          {messages.length === 0 && (
-            <TowazoBubble>
-              こんにちは！僕は towazo だよ〜<br />
-              アニメの相談なら何でも聞いてね！<br />
-              「今期のおすすめ教えて」とか「5本だけ選んで」とか、気軽に話しかけてね！
-            </TowazoBubble>
-          )}
           {messages.map((msg, idx) => (
             <ListItem key={idx} sx={{ px: 0, py: 1, flexDirection: 'column', alignItems: 'stretch' }}>
               {msg.role === 'user' ? (
