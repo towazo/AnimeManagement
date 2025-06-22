@@ -15,8 +15,17 @@ console.log('環境変数確認:', {
 const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyDhGO9FLQmDTKKYX_qY6_-o_-GNJyWS-6c';
 
 // CORS問題を回避するためのプロキシURL
-const API_BASE = process.env.REACT_APP_BACKEND_URL || '';
-const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+// バックエンドURLを多段で解決
+const API_BASE =
+  // CRA ビルド時に置換される環境変数
+  (process.env.REACT_APP_BACKEND_URL as string | undefined) ||
+  // Vite ビルドの場合
+  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_BACKEND_URL) ||
+  // ランタイムで window に直接埋め込んだ場合
+  (typeof window !== 'undefined' && (window as any).REACT_APP_BACKEND_URL) ||
+  // 最終フォールバック（※固定 URL は必要に応じて書き換えてください）
+  'https://fresh-owl-65.deno.dev';
+// 旧CORSプロキシは不要になったため削除
 
 
 
