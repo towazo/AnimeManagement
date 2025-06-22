@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Container, Typography, Grid, Card, CardContent, Button, Box, Avatar } from '@mui/material';
 import ChatPanel from '../components/ChatPanel';
 import ImageIdentifyDialog from '../components/ImageIdentifyDialog';
+import towazoImage from '../assets/towazo-mascot.png';
 
 const AIToolsPage: React.FC = () => {
   const [chatOpen, setChatOpen] = useState(false);
@@ -11,7 +12,7 @@ const AIToolsPage: React.FC = () => {
     <Container maxWidth="lg">
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, gap: 2 }}>
         <Avatar
-          src="/towazo-mascot.png"
+          src={towazoImage}
           alt="towazo"
           sx={{ width: 64, height: 64, border: '2px solid #42A5F5' }}
         />
@@ -35,7 +36,7 @@ const AIToolsPage: React.FC = () => {
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 1 }}>
                 <Avatar
-                  src="/towazo-mascot.png"
+                  src={towazoImage}
                   alt="towazo"
                   sx={{ width: 32, height: 32 }}
                 />
@@ -70,7 +71,7 @@ const AIToolsPage: React.FC = () => {
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 1 }}>
                 <Avatar
-                  src="/towazo-mascot.png"
+                  src={towazoImage}
                   alt="towazo"
                   sx={{ width: 32, height: 32 }}
                 />

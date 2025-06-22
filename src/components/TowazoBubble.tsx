@@ -1,59 +1,70 @@
 import React from 'react';
-import { Box, Typography, Avatar } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Box, Typography, Avatar, styled } from '@mui/material';
+import towazoImage from '../assets/towazo-mascot.png';
+
+interface TowazoBubbleProps {
+  children: React.ReactNode;
+}
 
 const BubbleContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'flex-start',
   gap: theme.spacing(2),
   marginBottom: theme.spacing(2),
-  [theme.breakpoints.down('sm')]: {
-    gap: theme.spacing(1),
-  },
-}));
-
-const BubbleContent = styled(Box)(({ theme }) => ({
-  backgroundColor: '#E3F2FD',
-  color: '#1565C0',
   padding: theme.spacing(2),
-  borderRadius: '16px 16px 16px 4px',
+  backgroundColor: '#F8F9FA',
+  borderRadius: '16px',
+  border: '1px solid #E3F2FD',
+  boxShadow: '0 2px 8px rgba(66, 165, 245, 0.1)',
   position: 'relative',
-  maxWidth: '80%',
-  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-  border: '2px solid #42A5F5',
-  [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(1.5),
-    maxWidth: '85%',
-  },
+  
   '&::before': {
     content: '""',
     position: 'absolute',
-    left: -8,
-    bottom: 8,
+    left: theme.spacing(8),
+    top: theme.spacing(1),
     width: 0,
     height: 0,
-    borderStyle: 'solid',
-    borderWidth: '0 8px 8px 0',
-    borderColor: 'transparent #42A5F5 transparent transparent',
+    borderLeft: '8px solid transparent',
+    borderRight: '8px solid #E3F2FD',
+    borderBottom: '8px solid #E3F2FD',
+    transform: 'rotate(45deg)',
   },
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    left: -6,
-    bottom: 10,
-    width: 0,
-    height: 0,
-    borderStyle: 'solid',
-    borderWidth: '0 6px 6px 0',
-    borderColor: 'transparent #E3F2FD transparent transparent',
+  
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(1.5),
+    gap: theme.spacing(1.5),
+    
+    '&::before': {
+      left: theme.spacing(6),
+    },
   },
 }));
 
-const TowazoBubble: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const MessageContent = styled(Box)(({ theme }) => ({
+  flex: 1,
+  backgroundColor: '#FFFFFF',
+  padding: theme.spacing(2),
+  borderRadius: '12px',
+  border: '1px solid #E1F5FE',
+  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+  
+  '& p': {
+    margin: 0,
+    lineHeight: 1.6,
+    color: '#333333',
+  },
+  
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(1.5),
+  },
+}));
+
+const TowazoBubble: React.FC<TowazoBubbleProps> = ({ children }) => {
   return (
     <BubbleContainer>
       <Avatar
-        src="/towazo-mascot.png"
+        src={towazoImage}
         alt="サイトマスコット towazo のイラスト"
         sx={{
           width: { xs: 48, sm: 56 },
@@ -63,11 +74,11 @@ const TowazoBubble: React.FC<{ children: React.ReactNode }> = ({ children }) => 
           backgroundColor: '#FFF8E1',
         }}
       />
-      <BubbleContent>
+      <MessageContent>
         <Typography variant="body1" component="div" sx={{ lineHeight: 1.6 }}>
           {children}
         </Typography>
-      </BubbleContent>
+      </MessageContent>
     </BubbleContainer>
   );
 };
