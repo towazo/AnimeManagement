@@ -13,7 +13,7 @@ const app = new Hono();
 app.use("/*", cors());
 
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-const GEMINI_URL_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
+const GEMINI_URL_BASE = "https://generativelanguage.googleapis.com/v1/models";
 const CHAT_MODEL = "gemini-pro";
 const VISION_MODEL = "gemini-pro-vision";
 
