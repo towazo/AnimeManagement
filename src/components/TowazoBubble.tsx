@@ -53,7 +53,7 @@ const TowazoBubble: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   return (
     <BubbleContainer>
       <Avatar
-        src="/towazo-mascot.png"
+        src="/towazo-icon.svg"
         alt="サイトマスコット towazo のイラスト"
         sx={{
           width: { xs: 48, sm: 56 },

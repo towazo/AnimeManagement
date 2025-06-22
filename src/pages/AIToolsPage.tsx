@@ -11,7 +11,7 @@ const AIToolsPage: React.FC = () => {
     <Container maxWidth="lg">
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, gap: 2 }}>
         <Avatar
-          src="/towazo-mascot.png"
+          src="/towazo-icon.svg"
           alt="towazo"
           sx={{ width: 64, height: 64, border: '2px solid #42A5F5' }}
         />
@@ -35,7 +35,7 @@ const AIToolsPage: React.FC = () => {
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 1 }}>
                 <Avatar
-                  src="/towazo-mascot.png"
+                  src="/towazo-icon.svg"
                   alt="towazo"
                   sx={{ width: 32, height: 32 }}
                 />
@@ -70,7 +70,7 @@ const AIToolsPage: React.FC = () => {
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 1 }}>
                 <Avatar
-                  src="/towazo-mascot.png"
+                  src="/towazo-icon.svg"
                   alt="towazo"
                   sx={{ width: 32, height: 32 }}
                 />
