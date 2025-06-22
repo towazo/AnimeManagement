@@ -2,6 +2,7 @@
 // Deno Deploy 用 Cloud Function。エンドポイント:
 //   POST /api/chat-optimize    { prompt: string }
 //   POST /api/image-identify   { imageBase64: string }
+//   GET /api/list-models
 // 環境変数 GEMINI_API_KEY に Google Generative AI API キーを設定してください。
 // デプロイ方法: Deno Deploy ダッシュボードから新規 Project を作成し、
 // GitHub リポジトリ (このディレクトリ) を指定すると自動でデプロイされます。
@@ -20,6 +21,32 @@ const VISION_MODEL = "gemini-1.0-pro-vision";
 if (!GEMINI_API_KEY) {
   console.error("GEMINI_API_KEY is not set");
 }
+
+app.get("/api/list-models", async (c) => {
+  try {
+    console.log("[/api/list-models] Fetching available models");
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1/models?key=${GEMINI_API_KEY}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+
+    if (!resp.ok) {
+      const errorText = await resp.text();
+      console.error(`[/api/list-models] API error: ${resp.status}`, errorText);
+      return c.json({ error: "Failed to fetch models", details: errorText }, resp.status);
+    }
+
+    const data = await resp.json();
+    console.log("[/api/list-models] Available models:", JSON.stringify(data, null, 2));
+    return c.json(data);
+  } catch (e) {
+    console.error("[/api/list-models] Error:", e);
+    return c.json({ error: "Internal Server Error", details: e.message }, 500);
+  }
+});
 
 app.post("/api/chat-optimize", async (c) => {
   try {
