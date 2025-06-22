@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-// APIキーを環境変数から取得
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+// APIキーを環境変数から取得（Create React Appの場合はprocess.envを使用）
+const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || '';
 // Gemini APIのエンドポイント
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 const GEMINI_PRO_MODEL = 'gemini-pro';
