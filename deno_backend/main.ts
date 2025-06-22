@@ -15,8 +15,8 @@ app.use("/*", cors());
 
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 const GEMINI_URL_BASE = "https://generativelanguage.googleapis.com/v1/models";
-const CHAT_MODEL = "gemini-1.0-pro";
-const VISION_MODEL = "gemini-1.0-pro-vision";
+const CHAT_MODEL = "gemini-1.5-pro";
+const VISION_MODEL = "gemini-1.0-pro-vision-latest";
 
 if (!GEMINI_API_KEY) {
   console.error("GEMINI_API_KEY is not set");
