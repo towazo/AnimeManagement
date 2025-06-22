@@ -5,6 +5,8 @@ import { Book as ArchiveIcon, AutoAwesome as AIIcon, ArrowForward as ArrowForwar
 import { AnimeContext } from '../context/AnimeContext';
 import { Anime } from '../types';
 import { useGemini } from '../hooks/useGemini';
+import ImageSlideshow from '../components/ImageSlideshow';
+import { getHighQualityImageUrl, handleImageError } from '../utils/imageUtils';
 
 // Recommendation type definition
 interface Recommendation {
@@ -174,9 +176,13 @@ ${animeJson}`;
                 <CardMedia
                   component="img"
                   height="200"
-                  image={imageErrors[rec.title] || !rec.imageUrl ? 'https://placehold.co/600x400/EEE/31343C.png?text=No+Image' : rec.imageUrl}
+                  image={imageErrors[rec.title] || !rec.imageUrl ? 'https://placehold.co/600x400/EEE/31343C.png?text=No+Image' : getHighQualityImageUrl(rec.imageUrl)}
                   alt={rec.title}
-                  sx={{ objectFit: 'cover' }}
+                  sx={{ 
+                    objectFit: 'cover',
+                    transition: 'transform 0.3s ease-in-out',
+                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                  }}
                   onError={() => handleImageError(rec.title)}
                 />
                 <CardContent>
@@ -197,28 +203,82 @@ ${animeJson}`;
 };
 
 
+// フィルターされた高品質画像URLを取得する関数
+const getValidImageUrls = (animeList: Anime[]): string[] => {
+  return animeList
+    .filter(anime => anime.imageUrl && anime.imageUrl.trim() !== '')
+    .map(anime => {
+      // MyAnimeListの画像URLを高品質版に変換（最後の.jpgをl.jpgに変換）
+      const url = anime.imageUrl as string;
+      if (url.includes('myanimelist.net') && url.endsWith('.jpg')) {
+        return url.replace(/\.jpg$/, 'l.jpg');
+      }
+      return url;
+    })
+    .filter(url => url.startsWith('http'));
+};
+
+// デフォルトの高品質画像URL（アニメリストが空の場合や有効な画像がない場合に使用）
+const defaultImages = [
+  'https://cdn.myanimelist.net/images/anime/1286/99889l.jpg',  // 鬼滅の刃（大サイズ画像）
+  'https://cdn.myanimelist.net/images/anime/10/47347l.jpg',    // 進撃の巨人（大サイズ画像）
+  'https://cdn.myanimelist.net/images/anime/1329/90618l.jpg',  // ヴァイオレット・エヴァーガーデン（大サイズ画像）
+  'https://cdn.myanimelist.net/images/anime/1441/122795l.jpg', // スパイファミリー（大サイズ画像）
+  'https://cdn.myanimelist.net/images/anime/1170/124312l.jpg'  // 呪術廻戦（大サイズ画像）
+];
+
 // HomePage Component
 const HomePage: React.FC = () => {
+  const animeContext = useContext(AnimeContext);
+  const [slideImages, setSlideImages] = useState<string[]>(defaultImages);
+
+  // アニメリストから有効な画像URLを取得
+  useEffect(() => {
+    if (animeContext && animeContext.animeList.length > 0) {
+      const validUrls = getValidImageUrls(animeContext.animeList);
+      if (validUrls.length >= 3) {
+        // 少なくとも3枚の有効な画像がある場合はそれを使用
+        setSlideImages(validUrls);
+      } else {
+        // 有効な画像が少ない場合は、デフォルト画像と組み合わせる
+        setSlideImages([...validUrls, ...defaultImages].slice(0, 5));
+      }
+    }
+  }, [animeContext]);
+
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          ダッシュボード
-        </Typography>
-        <Typography variant="h6" color="text.secondary">
-          ようこそ！あなたのアニメ活動をここで確認できます。
-        </Typography>
+    <>
+      {/* フル幅の高品質スライドショー */}
+      <Box sx={{ width: '100%', mb: 4, overflow: 'hidden', bgcolor: 'black' }}>
+        <ImageSlideshow 
+          images={slideImages} 
+          height="65vh" 
+          quality="high" 
+          autoPlayInterval={7000}
+          displayMode="natural" 
+        />
       </Box>
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={8}>
-          <AIRecommender />
-          <RecentlyAdded />
+      
+      <Container maxWidth="lg" sx={{ mb: 4 }}>
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            ダッシュボード
+          </Typography>
+          <Typography variant="h6" color="text.secondary">
+            ようこそ！あなたのアニメ活動をここで確認できます。
+          </Typography>
+        </Box>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={8}>
+            <AIRecommender />
+            <RecentlyAdded />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <QuickAccess />
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={4}>
-          <QuickAccess />
-        </Grid>
-      </Grid>
-    </Container>
+      </Container>
+    </>
   );
 };
 

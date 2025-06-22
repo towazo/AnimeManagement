@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; // useState をインポート
+import React, { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -7,14 +7,17 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Rating,
-  Chip,
-  Box,
-  IconButton,
   Typography,
+  Box,
+  Chip,
+  IconButton,
+  Rating,
+  TablePagination,
+  Checkbox,
+  TableSortLabel,
+  Tooltip,
   Menu, // 追加
   MenuItem, // 追加
-  Checkbox // 追加
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -23,6 +26,7 @@ import {
   PlaylistAdd as PlaylistAddIcon // 追加
 } from '@mui/icons-material';
 import { Anime, Genre } from '../types';
+import { getHighQualityImageUrl, handleImageError } from '../utils/imageUtils';
 import { useCustomLists } from '../context/CustomListContext'; // 追加
 
 // ジャンルごとの色を定義
@@ -137,14 +141,20 @@ const AnimeTable: React.FC<AnimeTableProps> = ({
                 )}
                 <TableCell component="th" scope="row">
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {anime.imageUrl && (
-                      <Box
-                        component="img"
-                        src={anime.imageUrl}
-                        alt={anime.title}
-                        sx={{ width: 40, height: 40, mr: 2, objectFit: 'cover', borderRadius: 1 }}
-                      />
-                    )}
+                    <Box
+                      component="img"
+                      src={getHighQualityImageUrl(anime.imageUrl)}
+                      alt={anime.title}
+                      sx={{ 
+                        width: 50, 
+                        height: 50, 
+                        mr: 2, 
+                        objectFit: 'cover', 
+                        borderRadius: 1,
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                      }}
+                      onError={handleImageError}
+                    />
                     <Typography variant="body1">{anime.title}</Typography>
                   </Box>
                 </TableCell>

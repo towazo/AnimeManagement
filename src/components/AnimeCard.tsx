@@ -15,6 +15,7 @@ import {
 import { Edit as EditIcon, Delete as DeleteIcon, Refresh as RefreshIcon, PlaylistAdd as PlaylistAddIcon } from '@mui/icons-material'; // PlaylistAddIcon を追加
 import { Anime, Genre } from '../types';
 import { useCustomLists } from '../context/CustomListContext'; // 追加
+import { getHighQualityImageUrl, handleImageError } from '../utils/imageUtils';
 
 // ジャンルごとの色を定義
 const genreColors: Record<Genre, string> = {
@@ -84,9 +85,13 @@ const AnimeCard: React.FC<AnimeCardProps> = ({ anime, onEdit, onDelete, onRewatc
       <CardMedia
         component="img"
         height="200"
-        image={anime.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'}
+        image={getHighQualityImageUrl(anime.imageUrl)}
         alt={anime.title}
-        sx={{ objectFit: 'cover' }}
+        sx={{ 
+          objectFit: 'cover',
+          transition: 'transform 0.3s ease-in-out',
+        }}
+        onError={handleImageError}
       />
       <CardContent sx={{ flexGrow: 1 }}>
         <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
