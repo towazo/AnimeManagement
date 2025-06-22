@@ -42,29 +42,12 @@ export const useGemini = () => {
             // バックエンドAPIを呼び出し
       const apiUrl = `${API_BASE}/api/chat-optimize`;
       console.log('リクエストURL:', apiUrl);
-      const response = await axios.post(
-        apiUrl,
-        {
-          contents: [
-            {
-              parts: [
-                { text: prompt }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.2,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 8192,
-          }
-        }
-      );
+      const response = await axios.post(apiUrl, { prompt });
       
       console.log('チャット最適化レスポンス受信');
       
       // レスポンスからテキストを抽出
-      const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const text = response.data.text || '';
       return text;
     } catch (err: any) {
       console.error('チャット最適化エラー:', err.response?.data || err.message);
@@ -87,37 +70,12 @@ export const useGemini = () => {
             // バックエンドAPIを呼び出し
       const apiUrl = `${API_BASE}/api/image-identify`;
       console.log('画像識別リクエストURL:', apiUrl);
-      const response = await axios.post(
-        apiUrl,
-        {
-          contents: [
-            {
-              parts: [
-                {
-                  text: "この画像はどのアニメのものか特定してください。アニメのタイトルのみを日本語で返してください。"
-                },
-                {
-                  inline_data: {
-                    mime_type: "image/jpeg",
-                    data: base64Data
-                  }
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.2,
-            topK: 32,
-            topP: 0.95,
-            maxOutputTokens: 4096,
-          }
-        }
-      );
+      const response = await axios.post(apiUrl, { imageBase64: base64Data });
       
       console.log('画像識別レスポンス受信');
       
       // レスポンスからテキストを抽出
-      const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const text = response.data.text || '';
       return text;
     } catch (err: any) {
       console.error('画像識別エラー:', err.response?.data || err.message);
