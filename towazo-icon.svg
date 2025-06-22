@@ -1,0 +1,26 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- towazo マスコットのSVGアイコン -->
+  <circle cx="32" cy="32" r="30" fill="#FFF8E1" stroke="#8D6E63" stroke-width="2"/>
+  <!-- 頭 -->
+  <circle cx="32" cy="28" r="18" fill="#FFCC80" stroke="#8D6E63" stroke-width="1.5"/>
+  <!-- 目 -->
+  <circle cx="26" cy="24" r="3" fill="#FFF"/>
+  <circle cx="38" cy="24" r="3" fill="#FFF"/>
+  <circle cx="26" cy="24" r="1.5" fill="#333"/>
+  <circle cx="38" cy="24" r="1.5" fill="#333"/>
+  <!-- 眼鏡 -->
+  <circle cx="26" cy="24" r="4" fill="none" stroke="#8D6E63" stroke-width="1"/>
+  <circle cx="38" cy="24" r="4" fill="none" stroke="#8D6E63" stroke-width="1"/>
+  <line x1="30" y1="24" x2="34" y2="24" stroke="#8D6E63" stroke-width="1"/>
+  <!-- ヘッドフォン -->
+  <path d="M18 20 C18 12, 46 12, 46 20" fill="none" stroke="#42A5F5" stroke-width="2"/>
+  <circle cx="18" cy="24" r="3" fill="#42A5F5"/>
+  <circle cx="46" cy="24" r="3" fill="#42A5F5"/>
+  <!-- 口 -->
+  <path d="M28 32 Q32 36 36 32" fill="none" stroke="#8D6E63" stroke-width="1.5"/>
+  <!-- 体 -->
+  <ellipse cx="32" cy="48" rx="12" ry="8" fill="#E3F2FD" stroke="#8D6E63" stroke-width="1"/>
+  <!-- コードブロック吹き出し -->
+  <rect x="48" y="12" width="12" height="8" rx="2" fill="#FFF" stroke="#8D6E63" stroke-width="1"/>
+  <text x="54" y="18" font-family="monospace" font-size="4" fill="#333">&lt;/&gt;</text>
+</svg>
