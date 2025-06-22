@@ -55,7 +55,8 @@ const ImageIdentifyDialog: React.FC<Props> = ({ open, onClose }) => {
           const parsed = JSON.parse(jsonText) as AnimeResult;
           setParsedResult(parsed);
         } else {
-          setError('結果の解析に失敗しました');
+          // JSON形式以外のプレーンテキストを処理する
+          setParsedResult({ title: text, confidencePercent: 100 });
         }
       } catch (err) {
         console.error('JSON解析エラー:', err);
