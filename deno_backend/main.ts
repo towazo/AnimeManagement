@@ -22,76 +22,106 @@ if (!GEMINI_API_KEY) {
 }
 
 app.post("/api/chat-optimize", async (c) => {
-  const { prompt } = await c.req.json();
-  if (!prompt) return c.json({ error: "prompt is required" }, 400);
+  try {
+    console.log("[/api/chat-optimize] Received request");
+    const body = await c.req.json();
+    console.log("[/api/chat-optimize] Request body:", JSON.stringify(body));
+    const { prompt } = body;
 
-  const resp = await fetch(
-    `${GEMINI_URL_BASE}/${CHAT_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [{ text: prompt }],
+    if (!prompt) {
+      console.error("[/api/chat-optimize] Validation failed: prompt is missing.");
+      return c.json({ error: "prompt is required" }, 400);
+    }
+
+    const resp = await fetch(
+      `${GEMINI_URL_BASE}/${CHAT_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.2,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 8192,
           },
-        ],
-        generationConfig: {
-          temperature: 0.2,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 8192,
-        },
-      }),
-    },
-  );
-  if (!resp.ok) {
-    return c.json({ error: await resp.text() }, 500);
+        }),
+      },
+    );
+
+    if (!resp.ok) {
+      const errorText = await resp.text();
+      console.error(`[/api/chat-optimize] Gemini API error: ${resp.status}`, errorText);
+      return c.json({ error: "Gemini API request failed", details: errorText }, resp.status);
+    }
+
+    const data = await resp.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    console.log("[/api/chat-optimize] Successfully processed. Returning text.");
+    return c.json({ text });
+  } catch (e) {
+    console.error("[/api/chat-optimize] Error processing request:", e);
+    return c.json({ error: "Internal Server Error", details: e.message }, 500);
   }
-  const data = await resp.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-  return c.json({ text });
 });
 
 app.post("/api/image-identify", async (c) => {
-  const { imageBase64 } = await c.req.json();
-  if (!imageBase64) return c.json({ error: "imageBase64 is required" }, 400);
-  const base64Data = imageBase64.replace(/^data:image\/(png|jpeg|jpg);base64,/, "");
+  try {
+    console.log("[/api/image-identify] Received request");
+    const body = await c.req.json();
+    console.log("[/api/image-identify] Request body received (size check).");
+    const { imageBase64 } = body;
 
-  const resp = await fetch(
-    `${GEMINI_URL_BASE}/${VISION_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              { text: "この画像はどのアニメ作品か特定してください。日本語タイトルのみ返してください。" },
-              {
-                inline_data: {
-                  mime_type: "image/jpeg",
-                  data: base64Data,
+    if (!imageBase64) {
+      console.error("[/api/image-identify] Validation failed: imageBase64 is missing.");
+      return c.json({ error: "imageBase64 is required" }, 400);
+    }
+    const base64Data = imageBase64.replace(/^data:image\/(png|jpeg|jpg);base64,/, "");
+
+    const resp = await fetch(
+      `${GEMINI_URL_BASE}/${VISION_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: "この画像はどのアニメ作品か特定してください。日本語タイトルのみ返してください。" },
+                {
+                  inline_data: {
+                    mime_type: "image/jpeg",
+                    data: base64Data,
+                  },
                 },
-              },
-            ],
+              ],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.2,
+            topK: 32,
+            topP: 0.95,
+            maxOutputTokens: 4096,
           },
-        ],
-        generationConfig: {
-          temperature: 0.2,
-          topK: 32,
-          topP: 0.95,
-          maxOutputTokens: 4096,
-        },
-      }),
-    },
-  );
-  if (!resp.ok) {
-    return c.json({ error: await resp.text() }, 500);
+        }),
+      },
+    );
+
+    if (!resp.ok) {
+      const errorText = await resp.text();
+      console.error(`[/api/image-identify] Gemini API error: ${resp.status}`, errorText);
+      return c.json({ error: "Gemini API request failed", details: errorText }, resp.status);
+    }
+
+    const data = await resp.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    console.log("[/api/image-identify] Successfully processed. Returning text.");
+    return c.json({ text });
+  } catch (e) {
+    console.error("[/api/image-identify] Error processing request:", e);
+    return c.json({ error: "Internal Server Error", details: e.message }, 500);
   }
-  const data = await resp.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-  return c.json({ text });
 });
 
 export default app;
