@@ -15,12 +15,10 @@ console.log('環境変数確認:', {
 const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyDhGO9FLQmDTKKYX_qY6_-o_-GNJyWS-6c';
 
 // CORS問題を回避するためのプロキシURL
+const API_BASE = process.env.REACT_APP_BACKEND_URL || '';
 const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
 
-// Gemini APIのエンドポイント
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
-const GEMINI_PRO_MODEL = 'gemini-pro';
-const GEMINI_VISION_MODEL = 'gemini-pro-vision';
+
 
 export const useGemini = () => {
   const [loading, setLoading] = useState(false);
@@ -32,13 +30,9 @@ export const useGemini = () => {
       setError(null);
       console.log('チャット最適化リクエスト送信:', prompt.slice(0, 30) + '...');
       
-      // デバッグ用にリクエスト情報をログ出力
-      console.log(`APIキーの長さ: ${API_KEY.length}文字`);
-      
-      // Gemini Pro APIを呼び出し（CORSプロキシ経由）
-      const apiUrl = `${GEMINI_API_URL}/${GEMINI_PRO_MODEL}:generateContent?key=${API_KEY}`;
+            // バックエンドAPIを呼び出し
+      const apiUrl = `${API_BASE}/api/chat-optimize`;
       console.log('リクエストURL:', apiUrl);
-      
       const response = await axios.post(
         apiUrl,
         {
@@ -81,13 +75,9 @@ export const useGemini = () => {
       // 画像データからBase64ヘッダーを削除（もしあれば）
       const base64Data = imageBase64.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
       
-      // デバッグ用にリクエスト情報をログ出力
-      console.log(`画像識別: APIキーの長さ: ${API_KEY.length}文字`);
-      
-      // Gemini Vision APIを呼び出し（CORSプロキシ経由）
-      const apiUrl = `${GEMINI_API_URL}/${GEMINI_VISION_MODEL}:generateContent?key=${API_KEY}`;
+            // バックエンドAPIを呼び出し
+      const apiUrl = `${API_BASE}/api/image-identify`;
       console.log('画像識別リクエストURL:', apiUrl);
-      
       const response = await axios.post(
         apiUrl,
         {
