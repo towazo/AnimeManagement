@@ -145,6 +145,14 @@ const AnimeForm: React.FC<AnimeFormProps> = ({ open, onClose, onSave, anime }) =
             error={!!errors.title}
             helperText={errors.title}
             required
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#333333',
+              },
+              '& .MuiInputLabel-root': {
+                color: '#666666',
+              },
+            }}
           />
           <TextField
             name="imageUrl"
@@ -153,6 +161,14 @@ const AnimeForm: React.FC<AnimeFormProps> = ({ open, onClose, onSave, anime }) =
             onChange={handleChange}
             fullWidth
             margin="dense"
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#333333',
+              },
+              '& .MuiInputLabel-root': {
+                color: '#666666',
+              },
+            }}
           />
           <TextField
             margin="dense"
@@ -164,6 +180,14 @@ const AnimeForm: React.FC<AnimeFormProps> = ({ open, onClose, onSave, anime }) =
             value={formData.year || ''}
             onChange={handleChange}
             InputProps={{ inputProps: { min: 1900, max: new Date().getFullYear() } }}
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#333333',
+              },
+              '& .MuiInputLabel-root': {
+                color: '#666666',
+              },
+            }}
           />
 
           <FormControl fullWidth margin="dense" error={!!errors.genres}>
@@ -219,6 +243,14 @@ const AnimeForm: React.FC<AnimeFormProps> = ({ open, onClose, onSave, anime }) =
             error={!!errors.watchedDate}
             helperText={errors.watchedDate}
             required
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#333333',
+              },
+              '& .MuiInputLabel-root': {
+                color: '#666666',
+              },
+            }}
           />
 
           <TextField
@@ -231,6 +263,14 @@ const AnimeForm: React.FC<AnimeFormProps> = ({ open, onClose, onSave, anime }) =
             value={formData.imageUrl || ''}
             onChange={handleChange}
             placeholder="https://example.com/image.jpg"
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#333333',
+              },
+              '& .MuiInputLabel-root': {
+                color: '#666666',
+              },
+            }}
           />
 
           <TextField
@@ -243,6 +283,14 @@ const AnimeForm: React.FC<AnimeFormProps> = ({ open, onClose, onSave, anime }) =
             variant="outlined"
             value={formData.notes || ''}
             onChange={handleChange}
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#333333',
+              },
+              '& .MuiInputLabel-root': {
+                color: '#666666',
+              },
+            }}
           />
         </DialogContent>
         <DialogActions>

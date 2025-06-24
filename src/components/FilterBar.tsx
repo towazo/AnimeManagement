@@ -86,7 +86,15 @@ const FilterBar: React.FC<FilterBarProps> = ({
         value={searchTerm}
         onChange={handleSearchChange}
         size="small"
-        sx={{ flexGrow: 1 }}
+        sx={{ 
+          flexGrow: 1,
+          '& .MuiInputBase-input': {
+            color: '#333333',
+          },
+          '& .MuiInputLabel-root': {
+            color: '#666666',
+          },
+        }}
       />
 
       <FormControl sx={{ minWidth: 200 }} size="small">

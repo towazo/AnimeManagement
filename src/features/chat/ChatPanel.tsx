@@ -142,6 +142,15 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ open, onClose }) => {
             onKeyPress={handleKeyPress}
             placeholder="メッセージを入力..."
             disabled={loading}
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#333333',
+              },
+              '& .MuiInputBase-input::placeholder': {
+                color: '#666666',
+                opacity: 1,
+              },
+            }}
           />
           <Button
             variant="contained"
