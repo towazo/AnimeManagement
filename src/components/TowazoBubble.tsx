@@ -48,11 +48,11 @@ const MessageContent = styled(Box)(({ theme }) => ({
   borderRadius: '12px',
   border: '1px solid #E1F5FE',
   boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+  color: '#333333',
   
   '& p': {
     margin: 0,
     lineHeight: 1.6,
-    color: '#333333',
   },
   
   [theme.breakpoints.down('sm')]: {
