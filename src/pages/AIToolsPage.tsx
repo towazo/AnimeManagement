@@ -20,7 +20,7 @@ const AIToolsPage: React.FC = () => {
           <Typography variant="h4" sx={{ color: '#1565C0', fontWeight: 'bold' }}>
             towazo アシスタント
           </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography variant="subtitle1" sx={{ color: '#666666' }}>
             僕と一緒にアニメを楽しもう！
           </Typography>
         </Box>
@@ -44,7 +44,7 @@ const AIToolsPage: React.FC = () => {
                   アニメ相談チャット
                 </Typography>
               </Box>
-              <Typography color="text.secondary" sx={{ mb: 2 }}>
+              <Typography sx={{ mb: 2, color: '#666666' }}>
                 僕 towazo と一緒にアニメについて話そう！<br />
                 「今期のおすすめ教えて」「5本だけ選んで」など、<br />
                 何でも気軽に相談してね。
@@ -79,7 +79,7 @@ const AIToolsPage: React.FC = () => {
                   画像識別サービス
                 </Typography>
               </Box>
-              <Typography color="text.secondary" sx={{ mb: 2 }}>
+              <Typography sx={{ mb: 2, color: '#666666' }}>
                 アニメの画像をアップロードしてくれれば、<br />
                 僕が作品名を推測するよ！<br />
                 スクリーンショットでも何でもOKだよ。

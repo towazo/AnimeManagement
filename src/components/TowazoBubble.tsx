@@ -75,7 +75,7 @@ const TowazoBubble: React.FC<TowazoBubbleProps> = ({ children }) => {
         }}
       />
       <MessageContent>
-        <Typography variant="body1" component="div" sx={{ lineHeight: 1.6 }}>
+        <Typography variant="body1" component="div" sx={{ lineHeight: 1.6, color: '#333333' }}>
           {children}
         </Typography>
       </MessageContent>

@@ -57,7 +57,7 @@ const RecentlyAdded: React.FC = () => {
             ))}
           </List>
         ) : (
-          <Typography variant="body2" color="text.secondary">まだアニメが登録されていません。</Typography>
+          <Typography variant="body2" sx={{ color: '#666666' }}>まだアニメが登録されていません。</Typography>
         )}
         <Box sx={{ mt: 2, textAlign: 'right' }}>
           <Button component={RouterLink} to="/archive" endIcon={<ArrowForwardIcon />}>
@@ -159,10 +159,10 @@ ${animeJson}`;
           </Button>
         </Box>
 
-        {error && <Typography color="error" sx={{ my: 2 }}>{error}</Typography>}
+        {error && <Typography sx={{ color: '#d32f2f', my: 2 }}>{error}</Typography>}
 
         {recommendations.length === 0 && !loading && !error && (
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: '#666666' }}>
                 {animeContext.animeList.length > 0 
                     ? 'おすすめを分析中です...'
                     : '視聴履歴がありません。まずはアニメをいくつか登録してください。'}
@@ -189,7 +189,7 @@ ${animeJson}`;
                   <Typography gutterBottom variant="h5" component="div">
                     {rec.title}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: '#666666' }}>
                     {rec.reason}
                   </Typography>
                 </CardContent>
@@ -264,7 +264,7 @@ const HomePage: React.FC = () => {
           <Typography variant="h4" component="h1" gutterBottom>
             ダッシュボード
           </Typography>
-          <Typography variant="h6" color="text.secondary">
+          <Typography variant="h6" sx={{ color: '#666666' }}>
             ようこそ！あなたのアニメ活動をここで確認できます。
           </Typography>
         </Box>

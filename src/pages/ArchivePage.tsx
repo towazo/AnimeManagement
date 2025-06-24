@@ -37,7 +37,7 @@ import FilterBar from '../components/FilterBar';
 import ImportExportDialog from '../components/ImportExportDialog';
 import { Anime } from '../types';
 
-const HomePage: React.FC = () => {
+const ArchivePage: React.FC = () => {
   const {
     filteredAnimeList,
     filters,
@@ -364,7 +364,7 @@ const HomePage: React.FC = () => {
       {/* 検索結果の件数表示 */}
       {filters.searchTerm && (
         <Box sx={{ mt: 1, mb: 2 }}>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: '#666666' }}>
             「{filters.searchTerm}」の検索結果: {filteredAnimeList.length}件
           </Typography>
         </Box>
@@ -375,7 +375,7 @@ const HomePage: React.FC = () => {
           <Typography variant="h6" gutterBottom>
             アニメが見つかりません
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" sx={{ color: '#666666' }}>
             検索条件を変更するか、新しいアニメを追加してください
           </Typography>
           <Button
@@ -566,4 +566,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default ArchivePage;

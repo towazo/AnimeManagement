@@ -100,16 +100,16 @@ const AnimeCard: React.FC<AnimeCardProps> = ({ anime, onEdit, onDelete, onRewatc
         
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
           <Rating value={anime.personalRating} readOnly precision={0.5} size="small" />
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+          <Typography variant="body2" sx={{ ml: 1, color: '#666666' }}>
             ({anime.personalRating})
           </Typography>
         </Box>
         
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+        <Typography variant="body2" sx={{ mb: 1, color: '#666666' }}>
           {anime.year ? `${anime.year}年` : ''}
         </Typography>
         
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <Typography variant="body2" sx={{ mb: 2, color: '#666666' }}>
           視聴日: {formatDate(anime.watchedDate)}
         </Typography>
         
@@ -129,7 +129,7 @@ const AnimeCard: React.FC<AnimeCardProps> = ({ anime, onEdit, onDelete, onRewatc
         </Box>
         
         {anime.notes && (
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: '#666666' }}>
             {anime.notes}
           </Typography>
         )}
