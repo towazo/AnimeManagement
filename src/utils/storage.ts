@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Anime, Genre } from '../types';
+import { Anime, Genre } from '../shared/types/anime';
 
 const STORAGE_KEY = 'anime_archive_data';
 

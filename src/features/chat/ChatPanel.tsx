@@ -5,22 +5,11 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SendIcon from '@mui/icons-material/Send';
-import { useGemini } from '../hooks/useGemini';
-import TowazoBubble from '../shared/components/TowazoBubble';
-import { convertToTowazoStyle } from '../shared/utils/towazoSpeech';
-import { isEmpty } from '../shared/utils/textProcessing';
-
-interface Message {
-  id: string;
-  text: string;
-  isUser: boolean;
-  timestamp: Date;
-}
-
-interface ChatPanelProps {
-  open: boolean;
-  onClose: () => void;
-}
+import { useGemini } from '../../hooks/useGemini';
+import TowazoBubble from '../../shared/components/TowazoBubble';
+import { convertToTowazoStyle } from '../../shared/utils/towazoSpeech';
+import { isEmpty } from '../../shared/utils/textProcessing';
+import { Message, ChatPanelProps } from './types';
 
 const ChatPanel: React.FC<ChatPanelProps> = ({ open, onClose }) => {
   const [messages, setMessages] = useState<Message[]>([]);

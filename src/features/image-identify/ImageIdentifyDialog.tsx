@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography, CircularProgress, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { useGemini } from '../hooks/useGemini';
-import TowazoBubble from '../shared/components/TowazoBubble';
-import { AnimeResult, ImageIdentifyDialogProps } from '../features/image-identify/types';
-import { generateTowazoComment, fileToBase64 } from '../features/image-identify/utils';
-import { extractAnimeTitle, isEmpty } from '../shared/utils/textProcessing';
+import { useGemini } from '../../hooks/useGemini';
+import TowazoBubble from '../../shared/components/TowazoBubble';
+import { AnimeResult, ImageIdentifyDialogProps } from './types';
+import { generateTowazoComment, fileToBase64 } from './utils';
+import { extractAnimeTitle, isEmpty } from '../../shared/utils/textProcessing';
 
 const ImageIdentifyDialog: React.FC<ImageIdentifyDialogProps> = ({ open, onClose }) => {
   const [file, setFile] = useState<File | null>(null);
