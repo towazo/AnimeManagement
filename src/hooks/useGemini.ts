@@ -9,10 +9,9 @@ console.log('環境変数確認:', {
   HAS_API_KEY: !!process.env.REACT_APP_GEMINI_API_KEY
 });
 
-// APIキーを環境変数から取得（フォールバックとしてデモ用キーを設定）
+// APIキーを環境変数から取得
 // 本番環境では必ずGitHubのSecretsにREACT_APP_GEMINI_API_KEYを設定すること
-// デモ用キーは制限付きですぐに使用不可になる可能性があります
-const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyDhGO9FLQmDTKKYX_qY6_-o_-GNJyWS-6c';
+const API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
 
 // CORS問題を回避するためのプロキシURL
 // バックエンドURLを多段で解決
