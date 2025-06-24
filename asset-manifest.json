@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.js": "/AnimeManagement/static/js/main.75a302ba.js",
+    "main.js": "/AnimeManagement/static/js/main.2781da49.js",
     "static/js/453.f7fa55c8.chunk.js": "/AnimeManagement/static/js/453.f7fa55c8.chunk.js",
-    "static/media/towazo-mascot.png": "/AnimeManagement/static/media/towazo-mascot.51865814770b968b5109.png",
+    "static/media/towazo-mascot.png": "/AnimeManagement/static/media/towazo-mascot.2d40ff00f6373d35fd26.png",
     "index.html": "/AnimeManagement/index.html",
-    "main.75a302ba.js.map": "/AnimeManagement/static/js/main.75a302ba.js.map",
+    "main.2781da49.js.map": "/AnimeManagement/static/js/main.2781da49.js.map",
     "453.f7fa55c8.chunk.js.map": "/AnimeManagement/static/js/453.f7fa55c8.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.75a302ba.js"
+    "static/js/main.2781da49.js"
   ]
 }
