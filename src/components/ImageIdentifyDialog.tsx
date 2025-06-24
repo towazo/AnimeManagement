@@ -33,6 +33,9 @@ const extractAnimeTitle = (text: string): string => {
 // towazoの口調でコメントを生成する関数
 const generateTowazoComment = (result: AnimeResult): string => {
   const { title, confidencePercent } = result;
+  if (!title || title.trim().length === 0) {
+    return 'うーん、作品名が分からなかったよ。もう一度画像を試してみて！';
+  }
   
   if (confidencePercent >= 90) {
     return `やった！この画像は「${title}」だと思うよ！\n僕の自信度は${confidencePercent}%だから、かなり確信してる。`;
@@ -94,8 +97,12 @@ const ImageIdentifyDialog: React.FC<ImageIdentifyDialogProps> = ({ open, onClose
           setParsedResult(parsed);
         } else {
           // JSON形式以外のプレーンテキストを処理する
-          const title = extractAnimeTitle(text);
-          setParsedResult({ title, confidencePercent: 100 });
+                    const title = extractAnimeTitle(text);
+          if (title.trim().length === 0) {
+            setError('作品名が見つからなかったみたい。もう一度試してみて！');
+          } else {
+            setParsedResult({ title, confidencePercent: 100 });
+          }
         }
       } catch (err) {
         console.error('JSON解析エラー:', err);

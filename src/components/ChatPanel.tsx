@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { convertToTowazoStyle } from '../shared/utils/towazoSpeech';
 import { Drawer, IconButton, Box, TextField, List, ListItem, ListItemText, CircularProgress, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
@@ -10,20 +11,7 @@ interface ChatPanelProps {
   onClose: () => void;
 }
 
-// towazoの口調に変換する関数
-const convertToTowazoStyle = (text: string): string => {
-  // 自然でフレンドリーな変換ルール
-  let converted = text
-    .replace(/です。/g, 'だよ。')
-    .replace(/ます。/g, 'るよ。')
-    .replace(/でしょう。/g, 'だと思う。')
-    .replace(/おすすめします/g, 'おすすめするよ')
-    .replace(/いかがでしょうか/g, 'どうかな？')
-    .replace(/ください/g, 'してね')
-    .replace(/^/, 'towazoだよ！ ');
-  
-  return converted;
-};
+
 
 const ChatPanel: React.FC<ChatPanelProps> = ({ open, onClose }) => {
   const [prompt, setPrompt] = useState('');
@@ -42,11 +30,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ open, onClose }) => {
     const currentPrompt = prompt;
     setPrompt('');
     const aiText = await chatOptimize(currentPrompt);
-    if (aiText) {
+    if (aiText && aiText.trim().length > 0) {
       const towazoText = convertToTowazoStyle(aiText);
       setMessages((prev) => [...prev, { role: 'ai', text: towazoText }]);
     } else {
-      setMessages((prev) => [...prev, { role: 'ai', text: 'ごめん、エラーが起きちゃった。少し時間を置いてもう一度試してみて！' }]);
+      setMessages((prev) => [...prev, { role: 'ai', text: 'ごめん、うまく返答ができなかったみたい。もう一度試してみて！' }]);
     }
   };
 
